@@ -1,0 +1,103 @@
+# MaehrDocs - Konfigurationsdatei
+# Automatisches Dokumentmanagementsystem
+
+# Pfade zu den Verzeichnissen
+paths:
+  input_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\01_InboxDocs"
+  output_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\02_FinalDocs"
+  trash_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\03_TrashDocs"
+  log_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\04_Logs"  # Neuer Ordner für Protokolle
+
+# OpenAI API-Einstellungen
+openai:
+  model: "gpt-3.5-turbo"  # Alternativ: gpt-4o für höhere Präzision
+  temperature: 0.3  # Niedrigere Temperatur für konsistentere Ergebnisse
+  max_retries: 3  # Anzahl der Wiederholungsversuche bei API-Fehlern
+  api_key_env: "OPENAI_API_KEY"  # Name der Umgebungsvariable für den API-Schlüssel
+  system_prompt: "Du bist ein präziser Dokumentenanalyst. Extrahiere relevante Informationen aus dem folgenden Dokument und gib sie im angeforderten Format zurück."
+
+# Dokumentverarbeitungseinstellungen
+document_processing:
+  max_file_size_mb: 20  # Maximale Dateigröße in MB
+  similarity_threshold: 0.85  # Schwellenwert für Duplikaterkennung (0.0 - 1.0)
+  max_pages_to_analyze: 20  # Maximale Anzahl zu analysierender Seiten bei großen Dokumenten
+  extract_images: false  # Bilder aus PDFs extrahieren (kann Performance beeinträchtigen)
+  ocr_enabled: false  # OCR für Dokumente ohne extrahierbaren Text aktivieren
+  
+  # Gültige Dokumenttypen
+  valid_doc_types:
+    - rechnung
+    - vertrag
+    - brief
+    - meldung
+    - bescheid
+    - dokument
+    - antrag
+    - angebot
+    - mahnung
+    - gutschrift
+
+  # Format für Dateinamen nach der Verarbeitung
+  filename_format: "{datum}_{typ}_{absender}_{betreff}.pdf"
+  date_format: "%Y-%m-%d"  # YYYY-MM-DD Format für Datum im Dateinamen
+
+# Erweiterte Duplikaterkennung
+duplicate_detection:
+  enabled: true  # Duplikaterkennung aktivieren
+  hash_compare: true  # Hash-basierter Vergleich für schnelle Erkennung exakter Duplikate
+  content_compare: true  # Inhaltsvergleich für ähnliche Dokumente
+  check_in_output_dir: true  # Auch im Ausgabeordner nach Duplikaten suchen
+  generate_report: true  # Duplikatbericht generieren
+  report_format: "html"  # Format des Duplikatberichts (text, json, html)
+  visual_comparison: true  # Visuellen Vergleich für gefundene Duplikate erstellen
+
+# GUI-Einstellungen
+gui:
+  theme: "dark"  # Farbschema (dark, light)
+  window_size: "1700x1300"  # Fenstergröße
+  font_size: 12  # Schriftgröße
+  show_duplicate_popup: true  # Popup anzeigen, wenn Duplikat gefunden wird
+  notify_on_completion: true  # Benachrichtigung anzeigen, wenn Verarbeitung abgeschlossen ist
+  enable_sounds: false  # Soundeffekte aktivieren
+  check_interval_seconds: 5  # Intervall für die Überprüfung auf neue Dokumente
+  notify_on_new_documents: true  # Benachrichtigung anzeigen, wenn neue Dokumente gefunden werden
+  
+  # Anpassbare Farben
+  colors:
+    background_dark: "#0D1117"    # Tiefdunkles Blau-Schwarz
+    background_medium: "#161B22"  # Etwas hellerer Hintergrund
+    card_background: "#1F2937"    # Dunkles Grau-Blau für Panels
+    primary: "#3B82F6"            # Auffälliges, modernes Blau
+    accent: "#60A5FA"             # Helleres Blau für Hover
+    text_primary: "#F9FAFB"       # Fast weiß
+    text_secondary: "#9CA3AF"     # Mittelhelles Grau-Blau
+    success: "#10B981"            # Frisches Grün
+    warning: "#FBBF24"            # Sattes Gelb-Orange
+    error: "#EF4444"              # Kräftiges Rot
+
+# Protokollierungseinstellungen
+logging:
+  level: "info"  # Protokollierungsebene (debug, info, warning, error)
+  file_logging: true  # In Datei protokollieren
+  console_logging: true  # In Konsole protokollieren
+  max_log_files: 10  # Maximale Anzahl von Protokolldateien
+  max_file_size_mb: 5  # Maximale Größe der Protokolldatei in MB
+
+# Automatisierungseinstellungen
+automation:
+  auto_process_new_files: false  # Automatisch neue Dateien verarbeiten
+  polling_interval_seconds: 300  # Intervall für die Überprüfung auf neue Dateien (5 Minuten)
+  notifications_enabled: true  # Benachrichtigungen bei automatischer Verarbeitung aktivieren
+  schedule:
+    enabled: false  # Zeitplanbasierte Verarbeitung aktivieren
+    time: "18:00"  # Tägliche Verarbeitungszeit (24-Stunden-Format)
+    days: [1, 2, 3, 4, 5]  # Wochentage (1 = Montag, 7 = Sonntag)
+
+# Erweiterte Einstellungen
+advanced:
+  debug_mode: false  # Debug-Modus aktivieren
+  keep_original_files: true  # Originaldateien behalten
+  temp_directory: ""  # Temporäres Verzeichnis (leer = Systemstandard)
+  memory_limit_mb: 512  # Speicherlimit in MB für die Verarbeitung großer Dateien
+  timeout_seconds: 60  # Zeitlimit für die Verarbeitung einer einzelnen Datei
+  max_concurrent_files: 1  # Maximale Anzahl gleichzeitig zu verarbeitender Dateien
