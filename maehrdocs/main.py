@@ -10,6 +10,11 @@ import os
 import sys
 import time
 
+# Füge das übergeordnete Verzeichnis zum Pythonpfad hinzu, um maehrdocs als Paket zu importieren
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
+
 # Logging einrichten
 logging.basicConfig(
     level=logging.INFO,
@@ -22,6 +27,7 @@ logging.basicConfig(
 
 # Importiere notwendige Module
 try:
+    # Jetzt sollte der Import funktionieren
     from maehrdocs import ConfigManager, DocumentProcessor
 except ImportError as e:
     logging.error(f"Fehler beim Importieren der Module: {str(e)}")

@@ -11,7 +11,7 @@ Dieses Paket enthält alle Komponenten für das MaehrDocs System:
 
 __version__ = '2.0.0'
 __author__ = 'René Mähr'
-__email__ = 'maehrdocs@example.com'
+__email__ = 'rene.maehr@web.de'
 
 # Hauptklassen für einfachen Import
 from .config import ConfigManager

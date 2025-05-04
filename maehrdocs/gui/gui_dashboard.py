@@ -4,7 +4,7 @@ Erstellt das Dashboard mit Statuskarten und Aktivitätsanzeige
 """
 
 import tkinter as tk
-from .gui_components import create_status_card
+from .gui_cards import create_status_card
 
 def create_dashboard(app, parent, config, open_folder_callback):
     """

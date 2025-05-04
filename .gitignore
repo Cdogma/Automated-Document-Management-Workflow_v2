@@ -1,0 +1,28 @@
+# Umgebungsvariablen und Konfiguration
+.env
+*.env
+
+# Python-Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+*.log
+logs/
+
+# Dokumenten- und binäre Dateien
+extra/
+*.docx
+*.pdf
+*.doc
+*.xls
+*.xlsx
+
+# Betriebssystemspezifische Dateien
+.DS_Store
+Thumbs.db
+
+# IDE-spezifische Dateien
+.vscode/
+.idea/

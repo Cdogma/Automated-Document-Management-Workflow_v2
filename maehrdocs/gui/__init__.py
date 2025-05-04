@@ -39,12 +39,18 @@ from .gui_document_viewer import (
     open_document
 )
 
-# Import der Event-Handler
-from .gui_handlers import (
+# Import der Event-Handler (jetzt aus gui_actions statt gui_handlers)
+from .gui_actions import (
     process_documents, 
     simulate_processing, 
     process_single_file
 )
+
+# Spezifische Module aus der neuen Aufteilung
+from .gui_document_actions import rebuild_config
+from .gui_drop_handlers import handle_drop, copy_files_to_inbox
+from .gui_command_executor import run_command_in_thread
+from .gui_notification_handlers import handle_duplicate_from_log
 
 # Exportiere die wichtigsten Klassen und Funktionen
 __all__ = [
@@ -55,5 +61,9 @@ __all__ = [
     'open_settings',
     'compare_documents',
     'open_document',
-    'process_documents'
+    'process_documents',
+    'rebuild_config',
+    'handle_drop',
+    'run_command_in_thread',
+    'handle_duplicate_from_log'
 ]
