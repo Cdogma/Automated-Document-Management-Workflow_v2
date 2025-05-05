@@ -144,3 +144,15 @@ Beiträge sind willkommen! Bitte öffnen Sie ein Issue oder einen Pull Request.
 ## Lizenz
 
 Dieses Projekt steht unter der MIT-Lizenz - siehe [LICENSE](LICENSE) für Details.
+
+## Abhängigkeiten
+
+### Erforderlich
+- Python 3.7 oder höher
+- PyMuPDF (fitz)
+- python-dotenv
+- openai
+- pyyaml
+
+### Optional
+- tkinterdnd2 - Für Drag & Drop-Funktionalität (empfohlen für bessere Benutzererfahrung)

@@ -1,6 +1,10 @@
 """
 Kernmodul der GUI-Anwendung für MaehrDocs
-Enthält die Hauptklasse GuiApp, die alle anderen GUI-Komponenten koordiniert
+Enthält die Hauptklasse GuiApp, die alle anderen GUI-Komponenten koordiniert und steuert.
+
+Dieses Modul dient als zentraler Einstiegspunkt für die grafische Benutzeroberfläche
+und verwaltet die Interaktion zwischen den verschiedenen GUI-Komponenten, dem Backend
+und der Anwendungskonfiguration.
 """
 
 import tkinter as tk
@@ -35,22 +39,42 @@ from .gui_settings import open_settings
 from .gui_help import show_help
 from .gui_actions import handle_drop
 
+# Neuer Import für den ErrorHandler
+from maehrdocs.error_handler import ErrorHandler
+
 class GuiApp:
     """
-    Hauptklasse für die MaehrDocs GUI-Anwendung
+    Hauptklasse für die MaehrDocs GUI-Anwendung.
+    
+    Diese Klasse dient als zentraler Koordinator für die gesamte GUI und:
+    - Initialisiert das Hauptfenster und alle UI-Komponenten
+    - Verwaltet das Farbschema und die Schriftarten
+    - Stellt Hilfsfunktionen für andere GUI-Komponenten bereit
+    - Koordiniert die Interaktion zwischen UI und Backend-Logik
+    - Verwaltet regelmäßige Hintergrundaufgaben und Updates
+    
+    Die GuiApp-Instanz wird von allen UI-Komponenten als Referenz verwendet,
+    um auf gemeinsame Ressourcen und Konfigurationen zuzugreifen.
     """
     def __init__(self, config_manager, document_processor):
         """
-        Initialisiert die GUI mit Konfiguration und Dokumentenprozessor
+        Initialisiert die GUI mit Konfiguration und Dokumentenprozessor.
+        
+        Setzt das Farbschema, die Schriftarten und die grundlegenden
+        Anwendungsreferenzen, ohne jedoch die eigentliche GUI zu erstellen.
+        Die GUI-Erstellung erfolgt separat über setup_gui().
         
         Args:
-            config_manager: Instanz des ConfigManager
-            document_processor: Instanz des DocumentProcessor
+            config_manager: Instanz des ConfigManager für Konfigurationszugriff
+            document_processor: Instanz des DocumentProcessor für Dokumentenverarbeitung
         """
         self.config_manager = config_manager
         self.config = config_manager.get_config()
         self.document_processor = document_processor
         self.logger = logging.getLogger(__name__)
+        
+        # Zentrale Fehlerbehandlung initialisieren
+        self.error_handler = ErrorHandler(self)
         
         # Farbschema definieren - modernes, dunkles Design
         self.colors = {
@@ -85,102 +109,143 @@ class GuiApp:
         self.dashboard_elements = {}
         self.processing = False
         self.last_inbox_count = 0
+        
+        # Zentrale Messaging-Instanz (wird in setup_gui initialisiert)
+        self.messaging = None
     
     def setup_gui(self):
         """
-        Richtet die GUI ein und gibt das Root-Fenster zurück
+        Richtet die GUI ein und erstellt alle UI-Komponenten.
+        
+        Erstellt das Hauptfenster, initialisiert alle UI-Komponenten wie
+        Header, Dashboard, Steuerungspanel und Protokollbereich, und
+        startet die regelmäßigen Hintergrundaufgaben wie die Prüfung
+        auf neue Dokumente.
         
         Returns:
             tk.Tk: Das Root-Fenster der Anwendung
         """
-        # Initialisiere das Hauptfenster mit TkinterDnD wenn verfügbar, sonst normales Tk
-        if DRAG_DROP_ENABLED:
-            self.root = TkinterDnD.Tk()
-        else:
-            self.root = tk.Tk()
-            self.logger.warning("TkinterDnD2 nicht installiert. Drag & Drop wird deaktiviert.")
-        
-        self.root.title("MaehrDocs - Automatisches Dokumentenmanagement")
-        self.root.geometry("1700x1300")
-        self.root.configure(bg=self.colors["background_dark"])
-        
-        # Hauptframe erstellen
-        self.main_frame = tk.Frame(self.root, bg=self.colors["background_dark"])
-        self.main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
-        
-        # Header erstellen
-        self.header_elements = create_header(
-            self,
-            self.main_frame,
-            lambda: open_settings(self),
-            lambda: show_help(self)
-        )
-        
-        # Dashboard erstellen
-        self.dashboard_elements = create_dashboard(
-            self,
-            self.main_frame,
-            self.config
-        )
-        
-        # Steuerungspanel erstellen
-        self.control_elements = create_control_panel(self, self.main_frame)
-        
-        # Protokollbereich erstellen
-        self.log_panel_elements = create_log_panel(
-            self,
-            self.main_frame,
-            lambda: clear_log(self)
-        )
-        self.log_text = self.log_panel_elements["log_text"]
-        
-        # Statusleiste erstellen
-        self.status_elements = create_status_bar(self, self.main_frame)
-        self.status_label = self.status_elements["status_label"]
-        
-        # Logging einrichten
-        setup_logging(self)
-        
-        # Dashboard aktualisieren
-        update_dashboard(self)
-        
-        # Drag & Drop-Unterstützung hinzufügen (wenn verfügbar)
-        if DRAG_DROP_ENABLED:
-            setup_drag_drop(self, lambda e: handle_drop(self, e))
-        else:
-            log_message(self, "Drag & Drop nicht verfügbar. Installieren Sie TkinterDnD2 für diese Funktion.", level="warning")
-        
-        # Prüfe periodisch auf neue Dokumente
-        self.root.after(5000, lambda: check_for_new_documents(self))
-        
-        return self.root
+        # Mit ErrorHandler für sichere GUI-Initialisierung
+        with self.error_handler.safe_operation(context="GUI-Initialisierung", level="critical"):
+            # Initialisiere das Hauptfenster mit TkinterDnD wenn verfügbar, sonst normales Tk
+            if DRAG_DROP_ENABLED:
+                self.root = TkinterDnD.Tk()
+            else:
+                self.root = tk.Tk()
+                self.logger.warning("TkinterDnD2 nicht installiert. Drag & Drop wird deaktiviert.")
+            
+            self.root.title("MaehrDocs - Automatisches Dokumentenmanagement")
+            self.root.geometry("1700x1300")
+            self.root.configure(bg=self.colors["background_dark"])
+            
+            # Hauptframe erstellen
+            self.main_frame = tk.Frame(self.root, bg=self.colors["background_dark"])
+            self.main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+            
+            # Header erstellen
+            self.header_elements = create_header(
+                self,
+                self.main_frame,
+                lambda: open_settings(self),
+                lambda: show_help(self)
+            )
+            
+            # Dashboard erstellen
+            self.dashboard_elements = create_dashboard(
+                self,
+                self.main_frame,
+                self.config
+            )
+            
+            # Steuerungspanel erstellen
+            self.control_elements = create_control_panel(self, self.main_frame)
+            
+            # Protokollbereich erstellen
+            self.log_panel_elements = create_log_panel(
+                self,
+                self.main_frame,
+                lambda: clear_log(self)
+            )
+            self.log_text = self.log_panel_elements["log_text"]
+            
+            # Statusleiste erstellen
+            self.status_elements = create_status_bar(self, self.main_frame)
+            self.status_label = self.status_elements["status_label"]
+            
+            # Logging einrichten
+            setup_logging(self)
+            
+            # Messaging-System initialisieren (NACH der GUI-Erstellung)
+            from .messaging import MessagingSystem
+            self.messaging = MessagingSystem(self)
+            
+            # ErrorHandler aktualisieren, um das jetzt verfügbare Messaging-System zu nutzen
+            self.error_handler.app = self
+            
+            # Dashboard aktualisieren
+            update_dashboard(self)
+            
+            # Drag & Drop-Unterstützung hinzufügen (wenn verfügbar)
+            if DRAG_DROP_ENABLED:
+                setup_drag_drop(self, lambda e: handle_drop(self, e))
+            else:
+                log_message(self, "Drag & Drop-Funktionalität nicht verfügbar. Für die volle Funktionalität wird TkinterDnD2 empfohlen. "
+                "Installieren Sie es mit 'pip install tkinterdnd2'.", 
+                level="warning")
+            
+            # Prüfe periodisch auf neue Dokumente
+            self.root.after(5000, lambda: check_for_new_documents(self))
+            
+            return self.root
     
     def open_folder(self, folder_suffix):
         """
-        Öffnet den angegebenen Ordner im Datei-Explorer
+        Öffnet den angegebenen Ordner im Datei-Explorer.
+        
+        Verwendet plattformspezifische Methoden, um den entsprechenden
+        Ordner im Standarddateimanager des Betriebssystems zu öffnen.
         
         Args:
-            folder_suffix: Ordnersuffix (für die Identifikation)
+            folder_suffix: Ordnersuffix (z.B. "01_InboxDocs") für die Identifikation
         """
-        from .gui_utils import open_folder_in_explorer
-        open_folder_in_explorer(self, folder_suffix)
+        # Mit ErrorHandler ausführen
+        def _open_folder():
+            from .gui_utils import open_folder_in_explorer
+            open_folder_in_explorer(self, folder_suffix)
+        
+        self.error_handler.try_except(_open_folder, context="Ordner öffnen", level="warning")
     
     def browse_folder(self, key):
         """
-        Öffnet einen Dialog zur Ordnerauswahl für ein Einstellungsfeld
+        Öffnet einen Dialog zur Ordnerauswahl für ein Einstellungsfeld.
+        
+        Zeigt einen Dateiauswahldialog und aktualisiert das entsprechende
+        Einstellungsfeld mit dem ausgewählten Ordnerpfad.
         
         Args:
-            key: Schlüssel des betroffenen Feldes
+            key: Schlüssel des betroffenen Konfigurationsfeldes
         """
-        from .gui_settings import browse_folder
-        browse_folder(self, key)
+        # Mit ErrorHandler ausführen
+        def _browse_folder():
+            from .gui_settings import browse_folder
+            browse_folder(self, key)
+        
+        self.error_handler.try_except(_browse_folder, context="Ordnerdialog", level="warning")
     
     def log(self, message, level="info"):
         """
-        Fügt eine Nachricht zum Protokollbereich hinzu
+        Fügt eine Nachricht zum Protokollbereich hinzu.
+        
+        Zentrale Methode zur Protokollierung von Nachrichten in der GUI
+        mit entsprechender visueller Hervorhebung je nach Log-Level.
         
         Args:
             message: Die zu protokollierende Nachricht
             level: Log-Level (info, warning, error, success)
         """
-        log_message(self, message, level)
+        # Bei verfügbarem Messaging-System dieses verwenden
+        if hasattr(self, 'messaging') and self.messaging:
+            self.messaging.notify(message, level=level)
+        else:
+            # Fallback zur älteren Methode
+            log_message(self, message, level)

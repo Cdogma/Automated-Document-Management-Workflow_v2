@@ -1,3 +1,22 @@
+# ==============================================================================
+# .gitignore für MaehrDocs – Projektdateien, Umgebungen und temporäre Inhalte
+# ------------------------------------------------------------------------------
+# Diese Datei definiert, welche Dateien und Ordner vom Git-Versionskontrollsystem
+# ausgeschlossen werden sollen. Sie hilft, vertrauliche Daten, temporäre Dateien,
+# Build-Artefakte und editor-/betriebssystemspezifische Dateien aus dem Repository
+# fernzuhalten.
+#
+# Enthaltene Kategorien:
+# - Umgebungsvariablen und Konfigurationsdateien (.env)
+# - Python-Bytecode und Cache-Dateien (__pycache__)
+# - Log-Dateien und temporäre Verzeichnisse
+# - Dokumente und Binärformate (z. B. .pdf, .docx, .xls)
+# - System- und IDE-spezifische Dateien (.DS_Store, .vscode/)
+#
+# Hinweis: Bei neuen Tools oder Dateitypen sollte diese Datei entsprechend erweitert werden.
+# ==============================================================================
+
+
 # Umgebungsvariablen und Konfiguration
 .env
 *.env

@@ -1,5 +1,25 @@
-# MaehrDocs - Konfigurationsdatei
-# Automatisches Dokumentmanagementsystem
+# ==============================================================================
+# MaehrDocs - Zentrale Konfigurationsdatei
+# ------------------------------------------------------------------------------
+# Diese Datei definiert alle relevanten Einstellungen für das automatisierte 
+# Dokumentenmanagementsystem MaehrDocs.
+#
+# Enthalten sind:
+# - Verzeichnisstrukturen für Eingabe, Ausgabe, Papierkorb und Protokolle
+# - OpenAI API-Parameter für die KI-gestützte Dokumentenanalyse
+# - Einstellungen zur Dateigröße, Seitenzahl, OCR und Duplikaterkennung
+# - Formatvorgaben für Dateinamen
+# - GUI-Designoptionen wie Theme, Farben, Benachrichtigungen und Fenstergröße
+# - Logging-Verhalten für Datei- und Konsolenausgabe
+# - Automatisierungsregeln inkl. Zeitplänen und Benachrichtigungen
+# - Erweiterte Debug-, Performance- und Sicherheitseinstellungen
+#
+# Hinweise:
+# - Alle Pfade können individuell angepasst werden
+# - Änderungen an dieser Datei wirken sich direkt auf das Verhalten der Anwendung aus
+# - Kommentare und Formatierung beibehalten, um Übersicht und Lesbarkeit zu gewährleisten
+# ==============================================================================
+
 
 # Pfade zu den Verzeichnissen
 paths:

@@ -1,6 +1,10 @@
 """
 OpenAI-Integration für MaehrDocs
-Verwaltet die Interaktion mit der OpenAI API
+Implementiert die Integration mit der OpenAI API für die Analyse von Dokumenteninhalten.
+
+Dieses Modul kapselt alle Interaktionen mit der OpenAI API und bietet robuste
+Fehlerbehandlung, Wiederholungslogik und strukturierte Antwortverarbeitung.
+Es ist ein zentraler Bestandteil der KI-gestützten Dokumentenverarbeitung.
 """
 
 import os
@@ -11,15 +15,27 @@ from dotenv import load_dotenv
 
 class OpenAIIntegration:
     """
-    Klasse zur Interaktion mit der OpenAI API
+    Klasse zur Interaktion mit der OpenAI API.
+    
+    Diese Klasse ist verantwortlich für:
+    - Konfiguration und Initialisierung der OpenAI API-Verbindung
+    - Formulierung von Prompts zur Dokumentenanalyse
+    - Verarbeitung von API-Antworten und Konvertierung in strukturierte Daten
+    - Fehlerbehandlung und automatische Wiederholungsversuche
+    
+    Die Integration verwendet primär das ChatCompletion-Feature der API,
+    um intelligente Dokumentenanalyse durchzuführen.
     """
     
     def __init__(self, config):
         """
-        Initialisiert die OpenAI-Integration
+        Initialisiert die OpenAI-Integration mit Konfiguration und API-Schlüssel.
+        
+        Lädt den API-Schlüssel aus der .env-Datei und konfiguriert die
+        OpenAI-Client-Bibliothek mit den übergebenen Einstellungen.
         
         Args:
-            config (dict): Konfigurationsdaten mit OpenAI-Einstellungen
+            config (dict): Konfigurationsdaten mit OpenAI-Einstellungen (Modell, Temperatur, etc.)
         """
         self.config = config
         self.logger = logging.getLogger(__name__)
@@ -34,11 +50,15 @@ class OpenAIIntegration:
     
     def analyze_document(self, text, valid_doc_types):
         """
-        Analysiert einen Dokumenttext mit der OpenAI API
+        Analysiert einen Dokumenttext mit der OpenAI API.
+        
+        Sendet einen Teil des Dokumenttextes an die OpenAI API mit einem
+        strukturierten Prompt zur Extraktion von Dokumentmetadaten wie
+        Absender, Datum, Dokumenttyp und Betreff.
         
         Args:
-            text (str): Zu analysierender Text
-            valid_doc_types (list): Liste gültiger Dokumenttypen
+            text (str): Zu analysierender Dokumenttext
+            valid_doc_types (list): Liste gültiger Dokumenttypen zur Kategorisierung
             
         Returns:
             dict: Extrahierte Dokumentinformationen oder None bei Fehler
@@ -76,14 +96,18 @@ class OpenAIIntegration:
     
     def _create_analysis_prompt(self, text, valid_doc_types):
         """
-        Erstellt den Prompt für die Dokumentanalyse
+        Erstellt den Prompt für die Dokumentenanalyse.
+        
+        Formuliert einen strukturierten Prompt für die OpenAI API, der
+        spezifische Anweisungen zur Extraktion von Dokumentinformationen
+        und das Format der gewünschten Antwort enthält.
         
         Args:
-            text (str): Zu analysierender Text
+            text (str): Zu analysierender Dokumenttext
             valid_doc_types (list): Liste gültiger Dokumenttypen
             
         Returns:
-            str: Formatierter Prompt
+            str: Formatierter Prompt für die API-Anfrage
         """
         return f"""Analysiere folgendes Dokument und extrahiere:
 1. Absender (Firma/Person, die das Dokument erstellt hat)
@@ -99,10 +123,13 @@ Dokumenttext:
     
     def _call_openai_api(self, prompt):
         """
-        Ruft die OpenAI API auf
+        Ruft die OpenAI API mit dem gegebenen Prompt auf.
+        
+        Konfiguriert die API-Anfrage basierend auf den Anwendungseinstellungen
+        (Modell, Temperatur) und sendet den Prompt an die OpenAI API.
         
         Args:
-            prompt (str): Prompt für die API
+            prompt (str): Der vollständige Prompt für die API
             
         Returns:
             str: API-Antworttext oder None bei Fehler
@@ -128,7 +155,11 @@ Dokumenttext:
     
     def _parse_json_response(self, response_text):
         """
-        Parst die JSON-Antwort der API
+        Parst die JSON-Antwort der API in ein Python-Dictionary.
+        
+        Extrahiert den JSON-Teil aus der API-Antwort und wandelt ihn in eine
+        strukturierte Python-Datenstruktur um. Berücksichtigt verschiedene
+        Formate, in denen die API das JSON zurückliefern kann.
         
         Args:
             response_text (str): Antworttext der API

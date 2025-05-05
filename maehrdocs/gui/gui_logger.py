@@ -1,6 +1,10 @@
 """
 Logging-Funktionalität für MaehrDocs GUI
-Enthält Funktionen zum Protokollieren von Nachrichten
+Implementiert ein visuelles Logging-System mit farblicher Hervorhebung verschiedener
+Log-Levels (Info, Warnung, Fehler, Erfolg) und Integration in die GUI-Komponenten.
+
+Dieses Modul verbindet das Python-Standard-Logging mit der grafischen Benutzeroberfläche
+und sorgt für konsistente und gut sichtbare Statusmeldungen während der Anwendungsausführung.
 """
 
 import tkinter as tk
@@ -9,10 +13,13 @@ from datetime import datetime
 
 def setup_logging(app):
     """
-    Richtet die Tags für das Logging ein
+    Richtet die Tags für das Logging im Textfeld ein und konfiguriert die Formatierung.
+    
+    Erstellt farbliche Tags für verschiedene Log-Levels, um die visuelle Unterscheidung
+    von Meldungen zu ermöglichen und die Benutzerfreundlichkeit zu verbessern.
     
     Args:
-        app: Instanz der GuiApp
+        app: Die GuiApp-Instanz mit dem konfigurierten log_text-Widget
     """
     if not hasattr(app, 'log_text') or app.log_text is None:
         return
@@ -32,12 +39,16 @@ def setup_logging(app):
 
 def log_message(app, message, level="info"):
     """
-    Fügt eine Nachricht zum Protokollbereich hinzu
+    Fügt eine formatierte Nachricht zum Protokollbereich der GUI hinzu.
+    
+    Die Nachricht wird mit Zeitstempel, Präfix je nach Level und entsprechender
+    Farbformatierung dargestellt. Zusätzlich wird die Nachricht an den Standard-Logger
+    weitergeleitet und in der Aktivitätsanzeige des Dashboards aktualisiert.
     
     Args:
-        app: Instanz der GuiApp
-        message: Die zu protokollierende Nachricht
-        level: Log-Level (info, warning, error, success)
+        app: Die GuiApp-Instanz mit dem konfigurierten log_text-Widget
+        message (str): Die zu protokollierende Nachricht
+        level (str): Log-Level ("info", "warning", "error", "success")
     """
     if not hasattr(app, 'log_text') or app.log_text is None:
         return
@@ -92,11 +103,15 @@ def log_message(app, message, level="info"):
 
 def update_activity_display(app, message):
     """
-    Aktualisiert die Aktivitätsanzeige mit der neuesten Nachricht
+    Aktualisiert die Aktivitätsanzeige im Dashboard mit der neuesten Nachricht.
+    
+    Zeigt die letzte Aktivität prominent im Dashboard an, um einen schnellen
+    Überblick über den aktuellen Status der Anwendung zu bieten, ohne dass
+    der Benutzer das vollständige Protokoll durchsuchen muss.
     
     Args:
-        app: Instanz der GuiApp
-        message: Die Nachricht, die angezeigt werden soll
+        app: Die GuiApp-Instanz mit konfiguriertem Dashboard
+        message (str): Die anzuzeigende Nachricht
     """
     if hasattr(app, 'dashboard_elements') and "activity_list" in app.dashboard_elements:
         activity_list = app.dashboard_elements["activity_list"]
@@ -107,14 +122,17 @@ def update_activity_display(app, message):
 
 def export_log(app, filepath=None):
     """
-    Exportiert das aktuelle Protokoll in eine Datei
+    Exportiert das aktuelle Protokoll in eine Textdatei.
+    
+    Ermöglicht es dem Benutzer, den kompletten Protokollinhalt für
+    Dokumentations- oder Fehlerbehebungszwecke zu speichern.
     
     Args:
-        app: Instanz der GuiApp
-        filepath: Pfad zur Zieldatei (optional)
+        app: Die GuiApp-Instanz mit dem konfigurierten log_text-Widget
+        filepath (str, optional): Zieldatei-Pfad. Falls None, wird ein Dialog geöffnet.
         
     Returns:
-        bool: True bei Erfolg, False bei Fehler
+        bool: True bei erfolgreicher Durchführung, False bei Fehler
     """
     if not hasattr(app, 'log_text') or app.log_text is None:
         return False

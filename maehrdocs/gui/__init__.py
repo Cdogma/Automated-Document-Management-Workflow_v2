@@ -1,7 +1,25 @@
+
 """
 GUI-Paket für MaehrDocs
-Enthält alle GUI-bezogenen Komponenten und Funktionalitäten
+
+Dieses Modul bündelt sämtliche grafischen Komponenten und Funktionen der Benutzeroberfläche für MaehrDocs. 
+Es stellt eine modulare, erweiterbare und benutzerfreundliche GUI bereit, die sowohl für die visuelle Darstellung 
+als auch für die Interaktion mit dem Dokumentenmanagement-System zuständig ist.
+
+Die enthaltenen Komponenten decken folgende Bereiche ab:
+- Aufbau und Start der Haupt-GUI-Anwendung (GuiApp)
+- Wiederverwendbare UI-Elemente wie Buttons, Karten, Formulare und Einstellungssektionen
+- Anzeige- und Vergleichsfunktionen für Dokumente
+- Dashboard zur Darstellung von Statusinformationen und Aktivitäten
+- Aktionen zur Dokumentenverarbeitung (z. B. Analyse, Umbenennung, Verschiebung)
+- Drag & Drop-Unterstützung und asynchrone Befehlsausführung
+- Integration von Benachrichtigungen und Duplikatserkennung
+
+Dieses Paket dient als zentrales Interface zwischen dem Benutzer und der Automatisierungslogik 
+von MaehrDocs. Es unterstützt eine konsistente UX und erlaubt durch die klare Modulstruktur 
+eine einfache Erweiterung oder Anpassung der Oberfläche.
 """
+
 
 # Import der Hauptklasse
 from .gui_core import GuiApp
@@ -22,10 +40,8 @@ from .gui_cards import (
 )
 
 # Import der Formular-Komponenten
-from .gui_forms import (
-    create_settings_section, 
-    create_form_field
-)
+from .gui_forms import create_form_field
+from .gui_settings_components import create_settings_section
 
 # Import der Dashboard-Funktionen
 from .gui_dashboard import create_dashboard

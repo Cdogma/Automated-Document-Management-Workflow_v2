@@ -8,7 +8,6 @@ import time
 import shutil
 import threading
 import tkinter as tk
-from tkinter import messagebox
 
 def handle_drop(app, event):
     """
@@ -20,7 +19,7 @@ def handle_drop(app, event):
     """
     # Prüfen, ob Drag & Drop aktiviert ist
     if not hasattr(event, 'data'):
-        app.log("Drag & Drop ist nicht verfügbar.", level="warning")
+        app.messaging.notify("Drag & Drop ist nicht verfügbar.", level="warning")
         return
         
     # Liste der gedropten Dateien
@@ -37,25 +36,25 @@ def handle_drop(app, event):
     pdf_files = [f for f in file_list if f.lower().endswith('.pdf')]
     
     if not pdf_files:
-        messagebox.showinfo("Keine PDFs", "Es wurden keine PDF-Dateien zum Verarbeiten gefunden.")
+        app.messaging.dialog("Keine PDFs", "Es wurden keine PDF-Dateien zum Verarbeiten gefunden.", type="info")
         return
         
     # Bestätigung
     if len(pdf_files) == 1:
-        answer = messagebox.askyesno(
+        if app.messaging.dialog(
             "Datei verarbeiten", 
-            f"Möchten Sie die Datei '{os.path.basename(pdf_files[0])}' verarbeiten?"
-        )
-        if answer:
+            f"Möchten Sie die Datei '{os.path.basename(pdf_files[0])}' verarbeiten?",
+            type="confirm"
+        ):
             from .gui_command_executor import run_command_in_thread
             run_command_in_thread(app, ["python", "autodocs_v2.py", "--single-file", pdf_files[0]])
     else:
         # Bei mehreren Dateien fragen, ob man sie in den Eingangsordner kopieren möchte
-        answer = messagebox.askyesno(
+        if app.messaging.dialog(
             "Dateien verarbeiten", 
-            f"Möchten Sie {len(pdf_files)} PDF-Dateien in den Eingangsordner kopieren?"
-        )
-        if answer:
+            f"Möchten Sie {len(pdf_files)} PDF-Dateien in den Eingangsordner kopieren?",
+            type="confirm"
+        ):
             copy_files_to_inbox(app, pdf_files)
 
 def copy_files_to_inbox(app, file_list):
@@ -126,11 +125,11 @@ def copy_files_to_inbox(app, file_list):
                 shutil.copy2(file_path, dest_path)
                 
                 # Log
-                app.log(f"Datei kopiert: {file_name}")
+                app.messaging.notify(f"Datei kopiert: {file_name}")
                 success_count += 1
                 
             except Exception as e:
-                app.log(f"Fehler beim Kopieren von {os.path.basename(file_path)}: {str(e)}", level="error")
+                app.messaging.notify(f"Fehler beim Kopieren von {os.path.basename(file_path)}: {str(e)}", level="error")
                 error_count += 1
                 
             # Kurze Pause für die UI
@@ -142,14 +141,16 @@ def copy_files_to_inbox(app, file_list):
         
         # Abschlussmeldung
         if error_count == 0:
-            messagebox.showinfo(
+            app.messaging.dialog(
                 "Kopiervorgang abgeschlossen", 
-                f"Alle {success_count} Dateien wurden erfolgreich in den Eingangsordner kopiert."
+                f"Alle {success_count} Dateien wurden erfolgreich in den Eingangsordner kopiert.",
+                type="info"
             )
         else:
-            messagebox.showwarning(
+            app.messaging.dialog(
                 "Kopiervorgang mit Fehlern abgeschlossen", 
-                f"{success_count} Dateien erfolgreich kopiert, {error_count} Fehler aufgetreten."
+                f"{success_count} Dateien erfolgreich kopiert, {error_count} Fehler aufgetreten.",
+                type="warning"
             )
         
         # Fenster schließen
@@ -159,9 +160,10 @@ def copy_files_to_inbox(app, file_list):
         app.update_dashboard()
         
         # Fragen, ob die Dateien verarbeitet werden sollen
-        if success_count > 0 and messagebox.askyesno(
+        if success_count > 0 and app.messaging.dialog(
             "Dateien verarbeiten", 
-            f"Möchten Sie die {success_count} kopierten Dateien jetzt verarbeiten?"
+            f"Möchten Sie die {success_count} kopierten Dateien jetzt verarbeiten?",
+            type="confirm"
         ):
             from .gui_document_actions import process_documents
             process_documents(app)

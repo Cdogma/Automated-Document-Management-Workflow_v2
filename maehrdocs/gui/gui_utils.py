@@ -1,6 +1,8 @@
+# Datei: maehrdocs/gui/gui_utils.py
+
 """
 Hilfsfunktionen für MaehrDocs GUI
-Enthält verschiedene Hilfsfunktionen für die GUI
+Enthält verschiedene Hilfsfunktionen für die GUI mit verbesserter Fehlerbehandlung
 """
 
 import os
@@ -20,7 +22,8 @@ def update_dashboard(app):
     Args:
         app: Instanz der GuiApp
     """
-    try:
+    # Verwenden des ErrorHandlers für diese Operation
+    with app.error_handler.safe_operation(context="Dashboard-Aktualisierung", level="warning"):
         # Inbox
         inbox_path = app.config["paths"]["input_dir"]
         inbox_count = len([f for f in os.listdir(inbox_path) if f.lower().endswith('.pdf')])
@@ -40,7 +43,7 @@ def update_dashboard(app):
         app.dashboard_elements["trash_card"].path_value.config(text=trash_path)
         
         # Letzte Verarbeitungszeit aktualisieren
-        app.status_label.config(text=f"Zuletzt aktualisiert: {datetime.now().strftime('%H:%M:%S')}")
+        app.messaging.update_status(f"Zuletzt aktualisiert: {datetime.now().strftime('%H:%M:%S')}")
         
         # Aktivitätsliste aktualisieren, wenn vorhanden
         if "activity_list" in app.dashboard_elements:
@@ -48,9 +51,6 @@ def update_dashboard(app):
             app.dashboard_elements["activity_list"].delete(1.0, tk.END)
             app.dashboard_elements["activity_list"].insert(tk.END, "Dashboard aktualisiert.")
             app.dashboard_elements["activity_list"].config(state=tk.DISABLED)
-            
-    except Exception as e:
-        log_message(app, f"Fehler beim Aktualisieren des Dashboards: {str(e)}", level="error")
 
 def open_folder_in_explorer(app, folder_suffix):
     """
@@ -60,7 +60,8 @@ def open_folder_in_explorer(app, folder_suffix):
         app: Instanz der GuiApp
         folder_suffix: Ordnersuffix (für die Identifikation)
     """
-    try:
+    # Verwenden der try_except-Methode des ErrorHandlers
+    def _open_folder():
         if folder_suffix == "01_InboxDocs":
             folder_path = app.config["paths"]["input_dir"]
         elif folder_suffix == "02_FinalDocs":
@@ -75,9 +76,12 @@ def open_folder_in_explorer(app, folder_suffix):
             os.startfile(folder_path)
         elif os.name == 'posix':  # macOS oder Linux
             subprocess.call(['open' if sys.platform == 'darwin' else 'xdg-open', folder_path])
-            
-    except Exception as e:
-        log_message(app, f"Fehler beim Öffnen des Ordners: {str(e)}", level="error")
+    
+    app.error_handler.try_except(
+        _open_folder, 
+        context="Öffnen des Ordners", 
+        level="warning"
+    )
 
 def setup_drag_drop(app, drop_callback):
     """
@@ -89,15 +93,22 @@ def setup_drag_drop(app, drop_callback):
     """
     # Prüfen, ob TkinterDnD2 importiert wurde
     if not hasattr(app.root, 'drop_target_register'):
-        log_message(app, "Drag & Drop nicht verfügbar. TkinterDnD2 ist nicht installiert.", level="warning")
+        app.messaging.notify(
+            "Drag & Drop nicht verfügbar. TkinterDnD2 ist nicht installiert.", 
+            level="warning"
+        )
         return
     
     # Register ist nur in tkinterdnd2 verfügbar
-    try:
+    def _setup_dnd():
         app.root.drop_target_register('DND_Files')
         app.root.dnd_bind('<<Drop>>', drop_callback)
-    except AttributeError:
-        log_message(app, "Fehler beim Einrichten von Drag & Drop", level="error")
+    
+    app.error_handler.try_except(
+        _setup_dnd,
+        context="Drag & Drop-Einrichtung",
+        level="warning"
+    )
 
 def clear_log(app):
     """
@@ -108,12 +119,25 @@ def clear_log(app):
     """
     if not hasattr(app, 'log_text') or app.log_text is None:
         return
+    
+    def _clear_log():
+        confirm = app.messaging.dialog(
+            "Protokoll löschen", 
+            "Möchten Sie das Protokoll wirklich löschen?", 
+            type="confirm"
+        )
         
-    if messagebox.askyesno("Protokoll löschen", "Möchten Sie das Protokoll wirklich löschen?"):
-        app.log_text.config(state=tk.NORMAL)
-        app.log_text.delete(1.0, tk.END)
-        app.log_text.config(state=tk.DISABLED)
-        log_message(app, "Protokoll gelöscht.")
+        if confirm:
+            app.log_text.config(state=tk.NORMAL)
+            app.log_text.delete(1.0, tk.END)
+            app.log_text.config(state=tk.DISABLED)
+            app.messaging.notify("Protokoll gelöscht.")
+    
+    app.error_handler.try_except(
+        _clear_log,
+        context="Protokoll löschen",
+        level="warning"
+    )
 
 def check_for_new_documents(app):
     """
@@ -122,14 +146,15 @@ def check_for_new_documents(app):
     Args:
         app: Instanz der GuiApp
     """
-    try:
+    # Mit ErrorHandler ausführen, aber keine visuelle Benachrichtigung bei Fehlern
+    with app.error_handler.safe_operation(context="Prüfung auf neue Dokumente", level="warning"):
         # Eingangsordner prüfen
         inbox_dir = app.config["paths"]["input_dir"]
         
         if not os.path.exists(inbox_dir):
             # Ordner erstellen, falls er nicht existiert
             os.makedirs(inbox_dir)
-            log_message(app, f"Eingangsordner erstellt: {inbox_dir}", level="info")
+            app.messaging.notify(f"Eingangsordner erstellt: {inbox_dir}", level="info")
             
         # Zähle PDF-Dateien
         pdf_count = len([f for f in os.listdir(inbox_dir) if f.lower().endswith('.pdf')])
@@ -141,12 +166,16 @@ def check_for_new_documents(app):
         # Wenn neue Dokumente vorhanden sind, Nachricht anzeigen
         if pdf_count > app.last_inbox_count and pdf_count > 0:
             new_count = pdf_count - app.last_inbox_count
-            log_message(app, f"{new_count} neue Dokumente im Eingangsordner entdeckt.", level="info")
+            app.messaging.notify(f"{new_count} neue Dokumente im Eingangsordner entdeckt.", level="info")
             
             # Benachrichtigung anzeigen wenn aktiviert
             if app.config.get("gui", {}).get("notify_on_new_documents", True):
-                if messagebox.askyesno("Neue Dokumente", 
-                                     f"{new_count} neue Dokumente im Eingangsordner entdeckt. Möchten Sie diese jetzt verarbeiten?"):
+                confirm = app.messaging.dialog(
+                    "Neue Dokumente", 
+                    f"{new_count} neue Dokumente im Eingangsordner entdeckt. Möchten Sie diese jetzt verarbeiten?",
+                    type="confirm"
+                )
+                if confirm:
                     process_documents(app)
         
         # Zustand aktualisieren
@@ -157,9 +186,6 @@ def check_for_new_documents(app):
             current_display = app.dashboard_elements["inbox_card"].count_value.cget("text")
             if pdf_count != int(current_display):
                 update_dashboard(app)
-        
-    except Exception as e:
-        log_message(app, f"Fehler beim Prüfen auf neue Dokumente: {str(e)}", level="error")
     
     # In 5 Sekunden erneut prüfen
     app.root.after(5000, lambda: check_for_new_documents(app))
@@ -171,14 +197,18 @@ def create_directory_structure(app):
     Args:
         app: Instanz der GuiApp
     """
-    try:
+    def _create_dirs():
         # Erstelle alle benötigten Verzeichnisse
         for key, path in app.config["paths"].items():
             if not os.path.exists(path):
                 os.makedirs(path)
-                log_message(app, f"Verzeichnis erstellt: {path}", level="info")
-    except Exception as e:
-        log_message(app, f"Fehler beim Erstellen der Verzeichnisstruktur: {str(e)}", level="error")
+                app.messaging.notify(f"Verzeichnis erstellt: {path}", level="info")
+    
+    app.error_handler.try_except(
+        _create_dirs,
+        context="Verzeichnisstruktur erstellen",
+        level="error"
+    )
 
 def get_file_count(directory, extension='.pdf'):
     """

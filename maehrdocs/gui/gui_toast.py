@@ -1,21 +1,32 @@
-# toast.py (im GUI-Unterordner)
+"""
+Toast-Benachrichtigungen für MaehrDocs
+Implementiert temporäre, nicht-modale Benachrichtigungen, die am unteren
+Bildschirmrand erscheinen und nach einer festgelegten Zeit automatisch verschwinden.
+
+Diese Art von Benachrichtigungen werden häufig für subtile Hinweise und 
+Rückmeldungen verwendet, ohne den Arbeitsfluss des Benutzers zu unterbrechen.
+"""
 
 import tkinter as tk
 from maehrdocs.gui.gui_animations import fade_in, fade_out
 
 class Toast:
     """
-    Eine Toast-Benachrichtigung, die kurzzeitig am unteren Bildschirmrand erscheint
+    Eine Toast-Benachrichtigung, die kurzzeitig am Bildschirmrand erscheint.
+    
+    Toast-Benachrichtigungen sind nicht-modale, temporäre Mitteilungen,
+    die nicht mit Benutzereingaben interagieren und nach einer bestimmten
+    Zeit automatisch verschwinden.
     """
     def __init__(self, app, message, duration=3000, position="bottom"):
         """
-        Erstellt eine neue Toast-Benachrichtigung
+        Erstellt eine neue Toast-Benachrichtigung.
         
         Args:
-            app: Die Hauptanwendung
-            message: Die anzuzeigende Nachricht
-            duration: Dauer in ms, wie lange der Toast angezeigt wird
-            position: Position des Toasts (bottom, top, center)
+            app: Die Hauptanwendung (GuiApp-Instanz)
+            message (str): Die anzuzeigende Nachricht
+            duration (int): Dauer in Millisekunden, wie lange der Toast angezeigt wird
+            position (str): Position des Toasts: "bottom", "top" oder "center"
         """
         self.app = app
         self.message = message
@@ -24,7 +35,16 @@ class Toast:
         self.window = None
         
     def show(self):
-        """Zeigt den Toast an"""
+        """
+        Zeigt den Toast an.
+        
+        Erzeugt ein neues Fenster, positioniert es entsprechend der 
+        Konfiguration, führt die Fade-In-Animation aus und startet einen
+        Timer für das automatische Ausblenden.
+        
+        Returns:
+            Das erzeugte Toast-Fenster-Objekt
+        """
         # Fenster erstellen
         self.window = tk.Toplevel(self.app)
         self.window.overrideredirect(True)
@@ -75,13 +95,19 @@ class Toast:
 
 def show_toast(app, message, duration=3000, position="bottom"):
     """
-    Zeigt einen Toast an und gibt das Fenster zurück
+    Hilfsfunktion zum einfachen Anzeigen eines Toasts.
+    
+    Erstellt und zeigt eine Toast-Benachrichtigung an, ohne dass 
+    der Aufrufer ein Toast-Objekt erstellen muss.
     
     Args:
-        app: Die Hauptanwendung
-        message: Die anzuzeigende Nachricht
-        duration: Dauer in ms, wie lange der Toast angezeigt wird
-        position: Position des Toasts (bottom, top, center)
+        app: Die Hauptanwendung (GuiApp-Instanz)
+        message (str): Die anzuzeigende Nachricht
+        duration (int): Dauer in Millisekunden, wie lange der Toast angezeigt wird
+        position (str): Position des Toasts: "bottom", "top" oder "center"
+        
+    Returns:
+        Das erzeugte Toast-Fenster-Objekt
     """
     toast = Toast(app, message, duration, position)
     return toast.show()

@@ -36,4 +36,7 @@ def handle_duplicate_from_log(app, log_line):
                 from .gui_document_viewer import show_duplicate_alert
                 show_duplicate_alert(app, original_file, duplicate_file, similarity_score)
     except Exception as e:
-        app.log(f"Fehler bei der Verarbeitung der Duplikatbenachrichtigung: {str(e)}", level="error")
+        app.messaging.notify(
+            f"Fehler bei der Verarbeitung der Duplikatbenachrichtigung: {str(e)}", 
+            level="error"
+        )

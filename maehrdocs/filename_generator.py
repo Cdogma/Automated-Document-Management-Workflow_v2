@@ -1,6 +1,10 @@
 """
 Dateinamengenerator für MaehrDocs
-Generiert standardisierte Dateinamen basierend auf extrahierten Dokumentinformationen
+Generiert standardisierte Dateinamen basierend auf extrahierten Dokumentinformationen.
+
+Dieses Modul implementiert die Logik zur Erzeugung konsistenter, strukturierter Dateinamen
+für verarbeitete Dokumente auf Basis der durch die KI-Analyse extrahierten Metadaten.
+Es sorgt für einheitliche Benennung und bessere Auffindbarkeit der Dokumente.
 """
 
 import os
@@ -10,12 +14,24 @@ from datetime import datetime
 
 class FilenameGenerator:
     """
-    Klasse zur Generierung standardisierter Dateinamen
+    Klasse zur Generierung standardisierter Dateinamen für verarbeitete Dokumente.
+    
+    Diese Klasse ist verantwortlich für:
+    - Formatierung von Datumsangaben in ein einheitliches Format
+    - Validierung und Normalisierung von Dokumenttypen
+    - Bereinigung von Absender- und Betreffsinformationen
+    - Zusammenstellung der Informationen zu einem strukturierten Dateinamen
+    
+    Der generierte Dateiname folgt dem Schema:
+    YYYY-MM-DD_Dokumenttyp_Absender_Betreff.pdf
     """
     
     def __init__(self, config):
         """
-        Initialisiert den FilenameGenerator
+        Initialisiert den FilenameGenerator mit der Anwendungskonfiguration.
+        
+        Richtet Logging ein und initialisiert Parameter für die Dateinamensgenerierung,
+        einschließlich ungültiger Zeichen und Längenbeschränkungen.
         
         Args:
             config (dict): Konfigurationsdaten mit gültigen Dokumenttypen
@@ -31,10 +47,14 @@ class FilenameGenerator:
     
     def generate_filename(self, doc_info):
         """
-        Generiert einen standardisierten Dateinamen basierend auf den extrahierten Informationen
+        Generiert einen standardisierten Dateinamen basierend auf den extrahierten Informationen.
+        
+        Verarbeitet die von der KI-Analyse extrahierten Dokumentinformationen und
+        erstellt daraus einen konsistenten, strukturierten Dateinamen nach dem
+        definierten Schema: YYYY-MM-DD_Dokumenttyp_Absender_Betreff.pdf
         
         Args:
-            doc_info (dict): Extrahierte Dokumentinformationen
+            doc_info (dict): Extrahierte Dokumentinformationen (Datum, Typ, Absender, Betreff)
             
         Returns:
             str: Generierter Dateiname oder None bei Fehler
@@ -68,13 +88,18 @@ class FilenameGenerator:
     
     def _format_date(self, date_str):
         """
-        Formatiert ein Datum im Format YYYY-MM-DD
+        Formatiert ein Datum im einheitlichen Format YYYY-MM-DD.
+        
+        Konvertiert verschiedene Datumsformate (DD.MM.YYYY, YYYY/MM/DD, etc.)
+        in das standardisierte Format YYYY-MM-DD und behandelt unvollständige
+        oder ungültige Datumsangaben, indem das aktuelle Datum als Fallback 
+        verwendet wird.
         
         Args:
-            date_str (str): Zu formatierendes Datum
+            date_str (str): Zu formatierendes Datum aus der Dokumentenanalyse
             
         Returns:
-            str: Formatiertes Datum oder Fallback
+            str: Formatiertes Datum im Format YYYY-MM-DD
         """
         # Versuche, das Datum zu extrahieren und zu validieren
         try:
@@ -105,13 +130,17 @@ class FilenameGenerator:
     
     def _format_document_type(self, doc_type):
         """
-        Formatiert den Dokumenttyp
+        Formatiert und validiert den Dokumenttyp gegen die Liste gültiger Typen.
+        
+        Normalisiert den Dokumenttyp und prüft, ob er in der konfigurierten Liste
+        gültiger Dokumenttypen enthalten ist. Versucht auch, ähnliche Dokumenttypen
+        zu finden, falls kein exakter Treffer vorliegt.
         
         Args:
-            doc_type (str): Zu formatierender Dokumenttyp
+            doc_type (str): Zu formatierender Dokumenttyp aus der Dokumentenanalyse
             
         Returns:
-            str: Formatierter Dokumenttyp oder Fallback
+            str: Formatierter und validierter Dokumenttyp oder "dokument" als Fallback
         """
         # Normalisiere den Dokumenttyp (Kleinbuchstaben, Leerzeichen entfernen)
         doc_type = doc_type.lower().strip()
@@ -132,13 +161,17 @@ class FilenameGenerator:
     
     def _format_sender(self, sender):
         """
-        Formatiert den Absender
+        Formatiert den Absender für die Verwendung im Dateinamen.
+        
+        Entfernt ungültige Zeichen aus dem Absender, begrenzt die Länge
+        und ersetzt Leerzeichen durch Unterstriche, um einen gültigen
+        Dateinamensteil zu erzeugen.
         
         Args:
-            sender (str): Zu formatierender Absender
+            sender (str): Zu formatierender Absender aus der Dokumentenanalyse
             
         Returns:
-            str: Formatierter Absender oder Fallback
+            str: Formatierter Absender oder "unbekannt" als Fallback
         """
         if not sender or not sender.strip():
             return "unbekannt"
@@ -161,13 +194,17 @@ class FilenameGenerator:
     
     def _format_subject(self, subject):
         """
-        Formatiert den Betreff
+        Formatiert den Betreff für die Verwendung im Dateinamen.
+        
+        Entfernt ungültige Zeichen aus dem Betreff, begrenzt die Länge
+        und ersetzt Leerzeichen durch Unterstriche, um einen gültigen
+        Dateinamensteil zu erzeugen.
         
         Args:
-            subject (str): Zu formatierender Betreff
+            subject (str): Zu formatierender Betreff aus der Dokumentenanalyse
             
         Returns:
-            str: Formatierter Betreff oder Fallback
+            str: Formatierter Betreff oder "ohne_betreff" als Fallback
         """
         if not subject or not subject.strip():
             return "ohne_betreff"

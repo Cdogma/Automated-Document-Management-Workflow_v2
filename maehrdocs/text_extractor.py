@@ -1,5 +1,11 @@
 """
 Textextraktion aus PDF-Dokumenten für MaehrDocs
+Enthält die TextExtractor-Klasse zum sicheren Extrahieren von Text und Metadaten
+aus PDF-Dokumenten unter Berücksichtigung verschiedener Fehlerszenarien.
+
+Dieses Modul ist ein zentraler Bestandteil der Dokumentenverarbeitung und
+stellt sicher, dass Textinhalte zuverlässig aus PDFs extrahiert werden können,
+bevor sie zur weiteren Analyse an die KI-Komponenten übergeben werden.
 """
 
 import os
@@ -8,18 +14,30 @@ import fitz  # PyMuPDF
 
 class TextExtractor:
     """
-    Klasse zur Extraktion von Text aus PDF-Dokumenten
+    Klasse zur Extraktion von Text aus PDF-Dokumenten.
+    
+    Diese Klasse bietet robuste Methoden zum:
+    - Extrahieren von Volltext aus PDF-Dokumenten
+    - Abrufen von PDF-Metadaten
+    - Validieren von PDF-Dateien (Existenz, Format, Größe)
+    
+    Die Implementierung verwendet die PyMuPDF-Bibliothek (Wrapper für MuPDF)
+    für performante und zuverlässige Textextraktion.
     """
     
     def __init__(self):
         """
-        Initialisiert den TextExtractor
+        Initialisiert den TextExtractor mit einem Logger.
         """
         self.logger = logging.getLogger(__name__)
     
     def extract_text_from_pdf(self, file_path):
         """
-        Extrahiert Text aus einer PDF-Datei
+        Extrahiert Text aus einer PDF-Datei.
+        
+        Öffnet die PDF-Datei, extrahiert den Text aus allen Seiten und
+        kombiniert ihn zu einem Gesamttext. Bei Problemen werden detaillierte
+        Fehlerprotokolle erstellt.
         
         Args:
             file_path (str): Pfad zur PDF-Datei
@@ -61,13 +79,16 @@ class TextExtractor:
     
     def get_pdf_metadata(self, file_path):
         """
-        Extrahiert Metadaten aus einer PDF-Datei
+        Extrahiert Metadaten aus einer PDF-Datei.
+        
+        Liest die Standardmetadaten wie Autor, Erstellungsdatum, Titel, usw.
+        aus dem PDF-Dokument aus.
         
         Args:
             file_path (str): Pfad zur PDF-Datei
             
         Returns:
-            dict: Metadaten oder leeres Dictionary bei Fehler
+            dict: Dictionary mit Metadaten oder leeres Dictionary bei Fehler
         """
         try:
             if not os.path.exists(file_path) or not file_path.lower().endswith('.pdf'):
@@ -82,11 +103,18 @@ class TextExtractor:
     
     def is_valid_pdf(self, file_path, max_size_mb=20):
         """
-        Prüft, ob eine Datei eine gültige PDF ist und die Größenbeschränkung einhält
+        Prüft, ob eine Datei eine gültige PDF ist und die Größenbeschränkung einhält.
+        
+        Führt mehrere Validierungsschritte durch:
+        1. Prüft, ob die Datei existiert
+        2. Prüft, ob die Datei eine .pdf-Erweiterung hat
+        3. Prüft, ob die Dateigröße unter dem Grenzwert liegt
+        4. Prüft, ob die Datei als gültiges PDF geöffnet werden kann
+        5. Prüft, ob das PDF mindestens eine Seite enthält
         
         Args:
             file_path (str): Pfad zur zu prüfenden Datei
-            max_size_mb (int): Maximale Dateigröße in MB
+            max_size_mb (int): Maximale zulässige Dateigröße in MB
             
         Returns:
             bool: True, wenn die Datei eine gültige PDF ist und die Größenbeschränkung einhält
