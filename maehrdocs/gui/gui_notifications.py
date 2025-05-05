@@ -1,143 +1,125 @@
-# gui_alerts.py
 """
-Dieses Modul dient als zentrale Schnittstelle für alle Benachrichtigungen und Dialoge
-in der MaehrDocs Anwendung. Es stellt verschiedene Funktionen zur Verfügung,
-um Benachrichtigungen und Dialoge anzuzeigen.
+Benachrichtigungssystem für MaehrDocs
+Implementiert visuelle Benachrichtigungen und Popup-Fenster für Systemmeldungen.
 
-Die eigentliche Implementierung dieser Funktionen wurde in separate Module ausgelagert:
-- notifications.py: Benachrichtigungsfenster
-- animations.py: Animationseffekte
-- toast.py: Toast-Nachrichten
-- dialog.py: Standard-Dialoge
+Dieses Modul enthält die Kernfunktionalität für das Anzeigen von
+Benachrichtigungen verschiedener Dringlichkeitsstufen (Info, Erfolg, Warnung, Fehler).
 """
-
-# Importe aus den spezialisierten Modulen
-from .gui_notifications import show_notification
+import logging
+import tkinter as tk
 from .gui_animations import animate_window, fade_in, fade_out
-from .gui_toast import show_toast
-from .gui_dialog import (
-    show_confirm_dialog,
-    show_info_dialog, 
-    show_error_dialog, 
-    show_warning_dialog
-)
 
-# Benachrichtigungsfunktionen
-def show_success(app, message, timeout=5000):
+def show_notification(app, message, level="info", timeout=5000):
     """
-    Zeigt eine Erfolgs-Benachrichtigung an
+    Zeigt eine Benachrichtigung an.
+    
+    Erstellt ein temporäres, animiertes Popup-Fenster mit einer Meldung,
+    das nach einer bestimmten Zeit automatisch verschwindet.
     
     Args:
-        app: Die Hauptanwendung
-        message: Die anzuzeigende Nachricht
-        timeout: Zeit in ms, nach der die Benachrichtigung automatisch verschwindet
+        app: Die GuiApp-Instanz
+        message (str): Die anzuzeigende Nachricht
+        level (str): Dringlichkeitsstufe (info, success, warning, error)
+        timeout (int): Anzeigedauer in Millisekunden
         
     Returns:
-        Das erstellte Benachrichtigungsfenster
+        tk.Toplevel: Das erzeugte Benachrichtigungsfenster
     """
-    return show_notification(app, message, level="success", timeout=timeout)
-
-def show_info(app, message, timeout=5000):
-    """
-    Zeigt eine Info-Benachrichtigung an
+    # Farben je nach Level
+    colors = {
+        "info": app.colors["primary"],
+        "success": app.colors["success"],
+        "warning": app.colors["warning"],
+        "error": app.colors["error"]
+    }
     
-    Args:
-        app: Die Hauptanwendung
-        message: Die anzuzeigende Nachricht
-        timeout: Zeit in ms, nach der die Benachrichtigung automatisch verschwindet
+    # Icons je nach Level
+    icons = {
+        "info": "ℹ️",
+        "success": "✅",
+        "warning": "⚠️",
+        "error": "❌"
+    }
+    
+    # Fenster erstellen
+    notif_window = tk.Toplevel(app.root)
+    notif_window.overrideredirect(True)  # Kein Fensterrahmen
+    notif_window.attributes("-topmost", True)  # Immer im Vordergrund
+    
+    # Styling
+    bg_color = colors.get(level, app.colors["primary"])
+    notif_window.configure(bg=bg_color)
+    
+    # Abstandhalter für Padding
+    padx, pady = 15, 10
+    
+    # Frame für Inhalt
+    content_frame = tk.Frame(notif_window, bg=bg_color, padx=padx, pady=pady)
+    content_frame.pack(fill=tk.BOTH, expand=True)
+    
+    # Icon
+    icon_label = tk.Label(
+        content_frame,
+        text=icons.get(level, "ℹ️"),
+        font=("Segoe UI", 16),
+        bg=bg_color,
+        fg=app.colors["text_primary"]
+    )
+    icon_label.pack(side=tk.LEFT, padx=(0, 10))
+    
+    # Nachricht
+    message_label = tk.Label(
+        content_frame,
+        text=message,
+        font=app.fonts["normal"],
+        bg=bg_color,
+        fg=app.colors["text_primary"],
+        wraplength=400,
+        justify=tk.LEFT
+    )
+    message_label.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    
+    # Schließen-Button
+    close_btn = tk.Label(
+        content_frame,
+        text="✖",
+        font=("Segoe UI", 12),
+        bg=bg_color,
+        fg=app.colors["text_primary"],
+        cursor="hand2"
+    )
+    close_btn.pack(side=tk.RIGHT, padx=(10, 0))
+    close_btn.bind("<Button-1>", lambda e: fade_out(notif_window))
+    
+    # Position berechnen (rechts unten)
+    notif_window.update_idletasks()
+    width = notif_window.winfo_width()
+    height = notif_window.winfo_height()
+    
+    screen_width = app.root.winfo_screenwidth()
+    screen_height = app.root.winfo_screenheight()
+    
+    x = screen_width - width - 20
+    y = screen_height - height - 40
+    
+    notif_window.geometry(f"+{x}+{y}")
+    
+    # Animation starten
+    animate_window(notif_window)
+    
+    # Automatisch schließen nach timeout
+    if timeout > 0:
+        notif_window.after(timeout, lambda: fade_out(notif_window))
+    
+    # Auch in die Log-Datei schreiben
+    if hasattr(app, 'logger'):
+        log_level = {
+            "info": logging.INFO,
+            "success": logging.INFO,
+            "warning": logging.WARNING,
+            "error": logging.ERROR
+        }.get(level, logging.INFO)
         
-    Returns:
-        Das erstellte Benachrichtigungsfenster
-    """
-    return show_notification(app, message, level="info", timeout=timeout)
-
-def show_warning(app, message, timeout=5000):
-    """
-    Zeigt eine Warnungs-Benachrichtigung an
+        app.logger.log(log_level, message)
     
-    Args:
-        app: Die Hauptanwendung
-        message: Die anzuzeigende Nachricht
-        timeout: Zeit in ms, nach der die Benachrichtigung automatisch verschwindet
-        
-    Returns:
-        Das erstellte Benachrichtigungsfenster
-    """
-    return show_notification(app, message, level="warning", timeout=timeout)
-
-def show_error(app, message, timeout=5000):
-    """
-    Zeigt eine Fehler-Benachrichtigung an
-    
-    Args:
-        app: Die Hauptanwendung
-        message: Die anzuzeigende Nachricht
-        timeout: Zeit in ms, nach der die Benachrichtigung automatisch verschwindet
-        
-    Returns:
-        Das erstellte Benachrichtigungsfenster
-    """
-    return show_notification(app, message, level="error", timeout=timeout)
-
-# Toast-Funktionen
-def show_success_toast(app, message, duration=3000):
-    """
-    Zeigt einen Erfolgs-Toast an
-    
-    Args:
-        app: Die Hauptanwendung
-        message: Die anzuzeigende Nachricht
-        duration: Dauer in ms, wie lange der Toast angezeigt wird
-        
-    Returns:
-        Das erstellte Toast-Fenster
-    """
-    return show_toast(app, message, duration)
-
-# Dialog-Wrapper-Funktionen
-def confirm(app, title, message):
-    """
-    Zeigt einen Bestätigungsdialog an und gibt das Ergebnis zurück
-    
-    Args:
-        app: Die Hauptanwendung
-        title: Der Titel des Dialogs
-        message: Die Nachricht des Dialogs
-        
-    Returns:
-        bool: True wenn der Benutzer bestätigt hat, sonst False
-    """
-    return show_confirm_dialog(app, title, message)
-
-def info(app, title, message):
-    """
-    Zeigt einen Informationsdialog an
-    
-    Args:
-        app: Die Hauptanwendung
-        title: Der Titel des Dialogs
-        message: Die Nachricht des Dialogs
-    """
-    show_info_dialog(app, title, message)
-    
-def error(app, title, message):
-    """
-    Zeigt einen Fehlerdialog an
-    
-    Args:
-        app: Die Hauptanwendung
-        title: Der Titel des Dialogs
-        message: Die Nachricht des Dialogs
-    """
-    show_error_dialog(app, title, message)
-    
-def warning(app, title, message):
-    """
-    Zeigt einen Warnungsdialog an
-    
-    Args:
-        app: Die Hauptanwendung
-        title: Der Titel des Dialogs
-        message: Die Nachricht des Dialogs
-    """
-    show_warning_dialog(app, title, message)
+    return notif_window

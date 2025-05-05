@@ -7,13 +7,14 @@ import subprocess
 import threading
 from tkinter import messagebox
 
-def run_command_in_thread(app, command):
+def run_command_in_thread(app, command, env=None):
     """
     Führt einen Befehl in einem separaten Thread aus
     
     Args:
         app: Instanz der GuiApp
         command: Liste mit Befehlszeile und Argumenten
+        env: Optionale Umgebungsvariablen für den Prozess
     """
     # Status aktualisieren
     app.status_label.config(text="Verarbeitung läuft...")
@@ -22,17 +23,18 @@ def run_command_in_thread(app, command):
     app.log(f"Führe Befehl aus: {' '.join(command)}")
     
     # Thread starten
-    thread = threading.Thread(target=_run_command, args=(app, command))
+    thread = threading.Thread(target=_run_command, args=(app, command, env))
     thread.daemon = True
     thread.start()
 
-def _run_command(app, command):
+def _run_command(app, command, env=None):
     """
     Führt den eigentlichen Befehl aus und aktualisiert das Protokoll
     
     Args:
         app: Instanz der GuiApp
         command: Liste mit Befehlszeile und Argumenten
+        env: Optionale Umgebungsvariablen für den Prozess
     """
     try:
         # Prozess starten und Ausgabe erfassen
@@ -42,7 +44,8 @@ def _run_command(app, command):
             stderr=subprocess.PIPE,
             text=True,
             bufsize=1,
-            universal_newlines=True
+            universal_newlines=True,
+            env=env  # Umgebungsvariablen hinzufügen
         )
         
         # Ausgabe in Echtzeit verarbeiten
@@ -66,8 +69,9 @@ def _run_command(app, command):
             app.log("Verarbeitung erfolgreich abgeschlossen.", level="success")
             app.status_label.config(text="Bereit")
             
-            # Dashboard aktualisieren
-            app.root.after(1000, app.update_dashboard)
+            # Dashboard aktualisieren - Verwende die Methode aus gui_utils
+            from .gui_utils import update_dashboard
+            app.root.after(1000, lambda: update_dashboard(app))
             
             # Benachrichtigung anzeigen wenn aktiviert
             if app.config.get("gui", {}).get("notify_on_completion", True):

@@ -7,8 +7,15 @@ spezialisierten Module wie gui_notifications.py und gui_animations.py weiter,
 um die Abwärtskompatibilität nach der Modularisierung zu gewährleisten.
 """
 
-from maehrdocs.gui.gui_notifications import show_notification
-from maehrdocs.gui.gui_animations import animate_window, fade_in, fade_out
+from .gui_notifications import show_notification
+from .gui_animations import animate_window, fade_in, fade_out
+from .gui_dialog import (
+    show_confirm_dialog,
+    show_info_dialog, 
+    show_error_dialog, 
+    show_warning_dialog
+)
+from .gui_toast import show_toast
 
 def show_success(app, message, timeout=5000):
     """
