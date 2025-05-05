@@ -50,10 +50,8 @@ from .gui_dashboard import create_dashboard
 from .gui_settings import open_settings
 
 # Import der Dokumentenansicht-Funktionen
-from .gui_document_viewer import (
-    compare_documents, 
-    open_document
-)
+from .gui_document_viewer import open_document
+from .gui_document_comparison import compare_documents
 
 # Import der Event-Handler (jetzt aus gui_actions statt gui_handlers)
 from .gui_actions import (

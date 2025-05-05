@@ -52,7 +52,8 @@ def analyze_python_file(file_path):
     functions = []
     classes = []
     
-    for node in ast.walk(tree):
+    # Top-Level-Definitionen finden
+    for node in tree.body:
         if isinstance(node, ast.FunctionDef):
             func_docstring = get_docstring(node)
             # Einfache Zusammenfassung aus dem Docstring extrahieren
@@ -67,7 +68,7 @@ def analyze_python_file(file_path):
             summary = class_docstring.split('\n')[0] if class_docstring else "Keine Beschreibung verfügbar"
             
             methods = []
-            for class_node in ast.walk(node):
+            for class_node in node.body:
                 if isinstance(class_node, ast.FunctionDef):
                     method_docstring = get_docstring(class_node)
                     method_summary = method_docstring.split('\n')[0] if method_docstring else "Keine Beschreibung verfügbar"
@@ -90,9 +91,16 @@ def analyze_python_file(file_path):
         'classes': classes
     }
 
-def generate_markdown(base_dir):
-    """Generiert eine Markdown-Dokumentation der Module und deren Inhalte."""
+def generate_markdown(base_dir, max_files=50):
+    """
+    Generiert eine Markdown-Dokumentation der Module und deren Inhalte.
+    
+    Args:
+        base_dir: Das Basisverzeichnis
+        max_files: Maximale Anzahl an Dateien zur Verarbeitung
+    """
     modules = {}
+    file_count = 0
     
     # Nur Python-Dateien in unserem Zielordner und dessen Unterordnern durchsuchen
     for root, dirs, files in os.walk(base_dir):
@@ -105,6 +113,11 @@ def generate_markdown(base_dir):
                 rel_path = os.path.relpath(file_path, base_dir)
                 module_path = rel_path.replace(os.path.sep, '.').replace('.py', '')
                 
+                # Überprüfe Dateigröße - überspringe sehr große Dateien
+                if os.path.getsize(file_path) > 100000:  # 100 KB
+                    print(f"Überspringe große Datei: {file_path}")
+                    continue
+                
                 if module_path == '__init__':
                     # Für __init__.py-Dateien setzen wir den Namen auf den Ordnernamen
                     module_path = os.path.basename(root)
@@ -113,10 +126,18 @@ def generate_markdown(base_dir):
                     'file_path': file_path,
                     'analysis': analyze_python_file(file_path)
                 }
+                
+                file_count += 1
+                if file_count >= max_files:
+                    print(f"Maximale Anzahl an Dateien ({max_files}) erreicht.")
+                    break
+        
+        if file_count >= max_files:
+            break
     
     # Markdown generieren
     markdown = "# MaehrDocs Modulübersicht\n\n"
-    markdown += "Diese Dokumentation wurde automatisch generiert und bietet einen Überblick über alle Module im MaehrDocs Projekt.\n\n"
+    markdown += f"Diese Dokumentation wurde automatisch generiert und bietet einen Überblick über {file_count} Module im MaehrDocs Projekt.\n\n"
     
     # Table of Contents
     markdown += "## Inhaltsverzeichnis\n\n"
@@ -176,6 +197,9 @@ def generate_module_markdown(module_name, module):
     # Moduldokumentationsstring
     module_docstring = module['analysis']['module_docstring']
     if module_docstring:
+        # Begrenze die Länge des Docstrings
+        if len(module_docstring) > 500:
+            module_docstring = module_docstring[:497] + "..."
         markdown += f"{module_docstring}\n\n"
     
     # Funktionen
@@ -198,7 +222,7 @@ def generate_module_markdown(module_name, module):
             if methods:
                 markdown += "  - Methoden:\n"
                 for method in methods:
-                    if method['name'] != '__init__':  # Private Methoden ausschließen
+                    if not method['name'].startswith('_'):  # Private Methoden ausschließen
                         markdown += f"    - `{method['name']}()` - {method['summary']}\n"
         markdown += "\n"
     
@@ -216,8 +240,8 @@ if __name__ == "__main__":
         base_dir = "."
         print(f"Verwende stattdessen das aktuelle Verzeichnis: {os.path.abspath(base_dir)}")
     
-    # Markdown generieren
-    markdown = generate_markdown(base_dir)
+    # Markdown generieren mit Begrenzung auf max. 50 Dateien
+    markdown = generate_markdown(base_dir, max_files=50)
     
     # In Datei schreiben
     output_file = "MaehrDocs_Modulübersicht.md"

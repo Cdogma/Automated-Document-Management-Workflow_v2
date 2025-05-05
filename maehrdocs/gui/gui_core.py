@@ -154,7 +154,8 @@ class GuiApp:
             self.dashboard_elements = create_dashboard(
                 self,
                 self.main_frame,
-                self.config
+                self.config,
+                self.open_folder  # Hinzufügen des fehlenden Parameters
             )
             
             # Steuerungspanel erstellen

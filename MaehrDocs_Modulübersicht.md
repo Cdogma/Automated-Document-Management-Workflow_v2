@@ -1,29 +1,40 @@
 # MaehrDocs Modulübersicht
 
-Diese Dokumentation wurde automatisch generiert und bietet einen Überblick über alle Module im MaehrDocs Projekt.
+Diese Dokumentation wurde automatisch generiert und bietet einen Überblick über 50 Module im MaehrDocs Projekt.
 
 ## Inhaltsverzeichnis
 
 ### Module
+- [Start_MAEHRDOCS_GUI_Launcher](#start_maehrdocs_gui_launcher) - START_MAEHRDOCS_GUI_Launcher.py – GUI-Launcher für MaehrDocs-Tools
+- [Start_MAEHRDOCS_Launcher](#start_maehrdocs_launcher) - START.py – Tool-Launcher-Menü für MaehrDocs
 
 ### maehrdocs Module
+- [maehrdocs.START_maehrdocs](#maehrdocs-start_maehrdocs) - Starter-Skript für MaehrDocs
+- [maehrdocs.Start_Paketvergleich_venv](#maehrdocs-start_paketvergleich_venv) - ────────────────────────────────────────────────────────────────────────────
+- [maehrdocs.Start_extract_code](#maehrdocs-start_extract_code) - MaehrDocs Code Extractor
+- [maehrdocs.Start_generate_module_docs](#maehrdocs-start_generate_module_docs) - MaehrDocs Modul-Dokumentations-Generator
+- [maehrdocs.Start_upload_to_github](#maehrdocs-start_upload_to_github) - upload_to_github.py – Schneller Git-Upload für deine Prüfskripte & Reports
 - [maehrdocs.__init__](#maehrdocs-__init__) - MaehrDocs - Automatisches Dokumentenmanagementsystem
+- [maehrdocs.check_env](#maehrdocs-check_env) - ────────────────────────────────────────────────────────────────────────────
+- [maehrdocs.check_env_html](#maehrdocs-check_env_html) - ────────────────────────────────────────────────────────────────────────────
 - [maehrdocs.config](#maehrdocs-config) - Konfigurationsverwaltung für MaehrDocs
+- [maehrdocs.config_core](#maehrdocs-config_core) - Kern-Konfigurationsmanagement für MaehrDocs
+- [maehrdocs.config_defaults](#maehrdocs-config_defaults) - Standard-Konfigurationswerte für MaehrDocs
+- [maehrdocs.config_utils](#maehrdocs-config_utils) - Hilfsfunktionen für die Konfigurationsverwaltung
 - [maehrdocs.document_processor](#maehrdocs-document_processor) - DocumentProcessor für MaehrDocs
-- [maehrdocs.duplicate_detector](#maehrdocs-duplicate_detector) - Keine Beschreibung verfügbar
+- [maehrdocs.duplicate_detector](#maehrdocs-duplicate_detector) - Duplikaterkennung für MaehrDocs
+- [maehrdocs.error_handler](#maehrdocs-error_handler) - Zentrale Fehlerbehandlung für MaehrDocs
 - [maehrdocs.file_operations](#maehrdocs-file_operations) - Dateioperationen für MaehrDocs
 - [maehrdocs.filename_generator](#maehrdocs-filename_generator) - Dateinamengenerator für MaehrDocs
-- [maehrdocs.gui.__init__](#maehrdocs-gui-__init__) - GUI-Paket für MaehrDocs
-- [maehrdocs.gui.generate_module_docs](#maehrdocs-gui-generate_module_docs) - MaehrDocs Modul-Dokumentations-Generator
 - [maehrdocs.gui.gui_actions](#maehrdocs-gui-gui_actions) - Event-Handler und Aktionen für MaehrDocs
-- [maehrdocs.gui.gui_alerts](#maehrdocs-gui-gui_alerts) - Keine Beschreibung verfügbar
-- [maehrdocs.gui.gui_animations](#maehrdocs-gui-gui_animations) - Keine Beschreibung verfügbar
+- [maehrdocs.gui.gui_alerts](#maehrdocs-gui-gui_alerts) - Benachrichtigungskomponenten für MaehrDocs
+- [maehrdocs.gui.gui_animations](#maehrdocs-gui-gui_animations) - Animations- und Effektkomponenten für MaehrDocs GUI
 - [maehrdocs.gui.gui_buttons](#maehrdocs-gui-gui_buttons) - Button-Komponenten für MaehrDocs GUI
 - [maehrdocs.gui.gui_cards](#maehrdocs-gui-gui_cards) - Karten- und Container-Komponenten für MaehrDocs GUI
 - [maehrdocs.gui.gui_command_executor](#maehrdocs-gui-gui_command_executor) - Befehlsausführung für MaehrDocs
 - [maehrdocs.gui.gui_core](#maehrdocs-gui-gui_core) - Kernmodul der GUI-Anwendung für MaehrDocs
 - [maehrdocs.gui.gui_dashboard](#maehrdocs-gui-gui_dashboard) - Dashboard-Funktionalität für MaehrDocs
-- [maehrdocs.gui.gui_dialog](#maehrdocs-gui-gui_dialog) - Keine Beschreibung verfügbar
+- [maehrdocs.gui.gui_dialog](#maehrdocs-gui-gui_dialog) - Dialog-Komponenten für MaehrDocs
 - [maehrdocs.gui.gui_document_actions](#maehrdocs-gui-gui_document_actions) - Dokumentenaktionen für MaehrDocs
 - [maehrdocs.gui.gui_document_comparison](#maehrdocs-gui-gui_document_comparison) - Dokumentenvergleich für MaehrDocs
 - [maehrdocs.gui.gui_document_loader](#maehrdocs-gui-gui_document_loader) - Dokumentenloader für MaehrDocs
@@ -34,22 +45,156 @@ Diese Dokumentation wurde automatisch generiert und bietet einen Überblick übe
 - [maehrdocs.gui.gui_help](#maehrdocs-gui-gui_help) - Hilfefunktionen für MaehrDocs
 - [maehrdocs.gui.gui_layout](#maehrdocs-gui-gui_layout) - Layout-Komponenten für MaehrDocs GUI
 - [maehrdocs.gui.gui_logger](#maehrdocs-gui-gui_logger) - Logging-Funktionalität für MaehrDocs GUI
+- [maehrdocs.gui.gui_messaging](#maehrdocs-gui-gui_messaging) - Zentrales Messaging-System für MaehrDocs
 - [maehrdocs.gui.gui_notification_handlers](#maehrdocs-gui-gui_notification_handlers) - Benachrichtigungshandler für MaehrDocs
 - [maehrdocs.gui.gui_notifications](#maehrdocs-gui-gui_notifications) - Dieses Modul dient als zentrale Schnittstelle für alle Benachrichtigungen und Dialoge
 - [maehrdocs.gui.gui_settings](#maehrdocs-gui-gui_settings) - Einstellungsmodul für MaehrDocs (Kompatibilitätsschicht)
-- [maehrdocs.gui.gui_settings_components](#maehrdocs-gui-gui_settings_components) - Einstellungskomponenten für MaehrDocs GUI
-- [maehrdocs.gui.gui_settings_dialog](#maehrdocs-gui-gui_settings_dialog) - Einstellungsdialog für MaehrDocs
-- [maehrdocs.gui.gui_toast](#maehrdocs-gui-gui_toast) - Keine Beschreibung verfügbar
-- [maehrdocs.gui.gui_utils](#maehrdocs-gui-gui_utils) - Hilfsfunktionen für MaehrDocs GUI
+- [maehrdocs.import_analyzer](#maehrdocs-import_analyzer) - Import-Analysator für MaehrDocs
+- [maehrdocs.import_analyzer_core](#maehrdocs-import_analyzer_core) - Kernfunktionalität des Import-Analysators für MaehrDocs
+- [maehrdocs.import_analyzer_graph](#maehrdocs-import_analyzer_graph) - Graph-Funktionalität des Import-Analysators für MaehrDocs
+- [maehrdocs.import_analyzer_parser](#maehrdocs-import_analyzer_parser) - Parser-Funktionalität des Import-Analysators für MaehrDocs
+- [maehrdocs.import_analyzer_report](#maehrdocs-import_analyzer_report) - Berichterstellung und Lösungsvorschläge für den Import-Analysator
 - [maehrdocs.main](#maehrdocs-main) - Haupteinstiegspunkt für MaehrDocs
 - [maehrdocs.openai_integration](#maehrdocs-openai_integration) - OpenAI-Integration für MaehrDocs
-- [maehrdocs.start_maehrdocs](#maehrdocs-start_maehrdocs) - Starter-Skript für MaehrDocs
 - [maehrdocs.text_extractor](#maehrdocs-text_extractor) - Textextraktion aus PDF-Dokumenten für MaehrDocs
 
 ## Module
 
+### Start_MAEHRDOCS_GUI_Launcher
+
+**Dateipfad:** `Start_MAEHRDOCS_GUI_Launcher.py`
+
+START_MAEHRDOCS_GUI_Launcher.py – GUI-Launcher für MaehrDocs-Tools
+────────────────────────────────────────────────────────────
+
+🧾 Beschreibung:
+Dieses Fenster-Tool bietet dir eine übersichtliche Bedienoberfläche, um die wichtigsten MaehrDocs-Tools direkt per Klick zu starten:
+- Umgebung prüfen (Konsole)
+- Umgebung prüfen (HTML)
+- Projekt auf GitHub hochladen
+
+Es ist modular aufgebaut, d. h. du kannst es später um neue Tools, Tabs oder ein Theme erweitern.
+
+Autor: René & Professor Schlau 🧙🏾‍♂...
+
+#### Funktionen
+
+- `tool_starten()` - Keine Beschreibung verfügbar
+
+---
+
+### Start_MAEHRDOCS_Launcher
+
+**Dateipfad:** `Start_MAEHRDOCS_Launcher.py`
+
+START.py – Tool-Launcher-Menü für MaehrDocs
+────────────────────────────────────────────────────────────
+✨ Komfortabler Einstiegspunkt für alle Tools des Projekts:
+- Umgebung prüfen (Konsole oder HTML)
+- Projekt über GitHub hochladen
+
+🧙‍♂️ Professor Schlau-Tipp:
+Das Menu ist modular aufgebaut und kann später um weitere Funktionen erweitert werden – z. B. Dokumentenscanner, PDF-Uploader usw.
+
+Autor: René & Professor Schlau
+Stand: 2025-05-05
+
+#### Funktionen
+
+- `run_tool()` - Keine Beschreibung verfügbar
+- `main_menu()` - Keine Beschreibung verfügbar
+
+---
+
 
 ## maehrdocs Module
+
+### maehrdocs.START_maehrdocs
+
+**Dateipfad:** `maehrdocs\START_maehrdocs.py`
+
+Starter-Skript für MaehrDocs
+Startet die GUI der Anwendung
+
+#### Funktionen
+
+- `main()` - Hauptfunktion zum Starten der GUI
+
+---
+
+### maehrdocs.Start_Paketvergleich_venv
+
+**Dateipfad:** `maehrdocs\Start_Paketvergleich_venv.py`
+
+────────────────────────────────────────────────────────────────────────────
+Start_Paketvergleich_venv.py – Vergleich globaler Python-Pakete mit virtueller Umgebung
+────────────────────────────────────────────────────────────────────────────
+
+🧾 Beschreibung:
+Dieses Tool hilft dir dabei, dein Python-Projekt auf eine saubere und isolierte
+virtuelle Umgebung (venv) umzustellen. Es vergleicht, welche Pakete du früher
+im globalen Python-Setup installiert hattest, und prüft, welche davon noch nicht...
+
+#### Funktionen
+
+- `lade_paketliste()` - Keine Beschreibung verfügbar
+
+---
+
+### maehrdocs.Start_extract_code
+
+**Dateipfad:** `maehrdocs\Start_extract_code.py`
+
+MaehrDocs Code Extractor
+
+Dieses Skript durchsucht alle Python-Dateien im angegebenen Verzeichnis
+und seiner Unterverzeichnisse und erstellt eine Textdatei mit dem gesamten Code.
+
+#### Funktionen
+
+- `extract_code()` - Extrahiert den Code aus allen Python-Dateien im angegebenen Verzeichnis
+
+---
+
+### maehrdocs.Start_generate_module_docs
+
+**Dateipfad:** `maehrdocs\Start_generate_module_docs.py`
+
+MaehrDocs Modul-Dokumentations-Generator
+
+Dieses Skript durchsucht rekursiv alle Python-Dateien im MaehrDocs-Paketverzeichnis und generiert 
+eine strukturierte Markdown-Dokumentation. Die Dokumentation enthält für jedes Modul:
+
+- Den relativen Dateipfad
+- Den Modul-Docstring (sofern vorhanden)
+- Eine Liste aller Funktionen mit Kurzbeschreibung
+- Eine Übersicht aller Klassen inklusive Methoden und zugehöriger Docstrings
+
+Die Ausgabe eignet sich ideal zur internen Projektdokumentation, Codepfle...
+
+#### Funktionen
+
+- `get_docstring()` - Extrahiert den Docstring aus einem AST-Knoten.
+- `analyze_python_file()` - Analysiert eine Python-Datei und extrahiert Funktionen, Klassen und deren Docstrings.
+- `generate_markdown()` - Generiert eine Markdown-Dokumentation der Module und deren Inhalte.
+- `generate_module_markdown()` - Generiert den Markdown-Abschnitt für ein bestimmtes Modul.
+
+---
+
+### maehrdocs.Start_upload_to_github
+
+**Dateipfad:** `maehrdocs\Start_upload_to_github.py`
+
+upload_to_github.py – Schneller Git-Upload für deine Prüfskripte & Reports
+────────────────────────────────────────────────────────────────────────────
+Fügt alle Änderungen in deinem Projektverzeichnis zum Git-Repo hinzu,
+committet sie automatisch mit einem Zeitstempel und pusht sie zu GitHub.
+
+Voraussetzung: 
+- Dein Projekt ist bereits ein `git init` Repository
+- Du hast `origin` zu GitHub verbunden (z. B. via SSH oder https)
+
+---
 
 ### maehrdocs.__init__
 
@@ -66,31 +211,131 @@ Dieses Paket enthält alle Komponenten für das MaehrDocs System:
 
 ---
 
+### maehrdocs.check_env
+
+**Dateipfad:** `maehrdocs\check_env.py`
+
+────────────────────────────────────────────────────────────────────────────
+check_env.py – Prüfung der Python-Umgebung auf wichtige Abhängigkeiten
+────────────────────────────────────────────────────────────────────────────
+
+🧾 Beschreibung:
+Dieses Tool prüft, ob du dich in einer aktiven venv befindest und ob alle wichtigen
+Pakete wie pydot, openai, pymupdf usw. korrekt installiert sind.
+
+📁 Es erstellt automatisch:
+- eine Logdatei namens `env_status.log` mit dem Prüfprotokoll
+- eine aktuelle ...
+
+#### Funktionen
+
+- `ist_venv_aktiv()` - Keine Beschreibung verfügbar
+- `ist_paket_da()` - Keine Beschreibung verfügbar
+- `schreibe_log()` - Keine Beschreibung verfügbar
+- `zeige_statusfenster()` - Keine Beschreibung verfügbar
+- `prüfe_umgebung()` - Keine Beschreibung verfügbar
+
+---
+
+### maehrdocs.check_env_html
+
+**Dateipfad:** `maehrdocs\check_env_html.py`
+
+────────────────────────────────────────────────────────────────────────────
+check_env_html.py – HTML-Bericht zur Python-Umgebungsprüfung
+────────────────────────────────────────────────────────────────────────────
+
+🧾 Zweck:
+Dieses Tool prüft, ob du dich in einer aktiven Python-virtuellen Umgebung (venv)
+befindest und ob alle für dein Projekt wichtigen Pakete installiert sind.
+
+👀 Besonderheit:
+Statt nur die Konsole zu nutzen, erzeugt dieses Skript eine gut lesbare
+HTML-Datei namens `env_statu...
+
+#### Funktionen
+
+- `ist_venv_aktiv()` - Keine Beschreibung verfügbar
+- `ist_paket_da()` - Keine Beschreibung verfügbar
+- `zeige_statusfenster()` - Keine Beschreibung verfügbar
+- `erstelle_html_report()` - Keine Beschreibung verfügbar
+
+---
+
 ### maehrdocs.config
 
 **Dateipfad:** `maehrdocs\config.py`
 
 Konfigurationsverwaltung für MaehrDocs
-Enthält die ConfigManager-Klasse zum Laden und Speichern der Konfiguration
+Enthält die ConfigManager-Klasse zum Laden, Speichern und Verwalten der Anwendungskonfiguration.
 
-#### Funktionen
+Dieses Modul bildet das Herzstück für alle konfigurationsbezogenen Funktionen und
+gewährleistet eine konsistente, persistente Speicherung von Benutzereinstellungen.
+Es unterstützt das Erstellen von Standardkonfigurationen und das sichere Speichern
+und Laden von Konfigurationsdaten im YAML-Format.
 
-- `__init__()` - Initialisiert den ConfigManager
-- `get_config()` - Gibt die aktuelle Konfiguration zurück
-- `load_config()` - Lädt die Konfiguration aus der YAML-Datei
-- `save_config()` - Speichert die Konfiguration in die YAML-Datei
-- `create_default_config()` - Erstellt eine Standardkonfiguration
-- `_ensure_directories_exist()` - Stellt sicher, dass die angegebenen Verzeichnisse existieren
+Die Implementierung als Singleton-Pattern stellt sicher, dass...
 
 #### Klassen
 
-- `ConfigManager` - Verwaltet die Konfiguration des MaehrDocs-Systems
+- `ConfigManagerExtended` - Erweiterte Version der ConfigManager-Klasse mit zusätzlichen Hilfsfunktionen
   - Methoden:
+    - `update_config()` - Aktualisiert die Konfiguration mit den angegebenen Werten
+    - `reset_section()` - Setzt einen Konfigurationsabschnitt auf die Standardwerte zurück
+    - `reset_config()` - Setzt die gesamte Konfiguration auf die Standardwerte zurück
+    - `get_value()` - Holt einen Wert aus der Konfiguration mit Punktnotation (z.B. 'paths.input_dir')
+
+---
+
+### maehrdocs.config_core
+
+**Dateipfad:** `maehrdocs\config_core.py`
+
+Kern-Konfigurationsmanagement für MaehrDocs
+Enthält die ConfigManager-Klasse zum Laden und Speichern der Anwendungskonfiguration.
+
+Implementiert das Singleton-Pattern für konsistenten Zugriff auf die Konfiguration
+im gesamten System und verhindert Dateninkonsistenzen durch mehrfache Instanzen.
+
+#### Klassen
+
+- `ConfigManager` - Verwaltet die Konfiguration des MaehrDocs-Systems als Singleton
+  - Methoden:
+    - `config()` - Property-Getter für die Konfiguration mit Lazy Loading
     - `get_config()` - Gibt die aktuelle Konfiguration zurück
-    - `load_config()` - Lädt die Konfiguration aus der YAML-Datei
+    - `reload_config()` - Lädt die Konfiguration neu und gibt sie zurück
     - `save_config()` - Speichert die Konfiguration in die YAML-Datei
-    - `create_default_config()` - Erstellt eine Standardkonfiguration
-    - `_ensure_directories_exist()` - Stellt sicher, dass die angegebenen Verzeichnisse existieren
+
+---
+
+### maehrdocs.config_defaults
+
+**Dateipfad:** `maehrdocs\config_defaults.py`
+
+Standard-Konfigurationswerte für MaehrDocs
+Enthält Funktionen zur Erstellung der Standardkonfiguration 
+und zur Verzeichnisverwaltung.
+
+#### Funktionen
+
+- `create_default_config()` - Erstellt eine Standardkonfiguration
+- `ensure_directories_exist()` - Stellt sicher, dass die angegebenen Verzeichnisse existieren
+
+---
+
+### maehrdocs.config_utils
+
+**Dateipfad:** `maehrdocs\config_utils.py`
+
+Hilfsfunktionen für die Konfigurationsverwaltung
+Enthält Funktionen zum Aktualisieren und Abfragen von Konfigurationswerten.
+
+#### Funktionen
+
+- `update_config()` - Aktualisiert die Konfiguration mit den angegebenen Werten
+- `reset_section()` - Setzt einen Konfigurationsabschnitt auf die Standardwerte zurück
+- `reset_config()` - Setzt die gesamte Konfiguration auf die Standardwerte zurück
+- `get_value()` - Holt einen Wert aus der Konfiguration mit Punktnotation (z.B. 'paths.input_dir')
 
 ---
 
@@ -100,11 +345,6 @@ Enthält die ConfigManager-Klasse zum Laden und Speichern der Konfiguration
 
 DocumentProcessor für MaehrDocs
 Hauptklasse zur Verarbeitung von Dokumenten
-
-#### Funktionen
-
-- `__init__()` - Initialisiert den DocumentProcessor mit der Konfiguration
-- `process_document()` - Verarbeitet ein einzelnes Dokument
 
 #### Klassen
 
@@ -118,18 +358,32 @@ Hauptklasse zur Verarbeitung von Dokumenten
 
 **Dateipfad:** `maehrdocs\duplicate_detector.py`
 
-#### Funktionen
-
-- `__init__()` - Keine Beschreibung verfügbar
-- `calculate_similarity()` - Berechnet die Textähnlichkeit zwischen zwei Dokumenten
-- `_tokenize()` - Text in Wörter aufteilen und bereinigen
+Duplikaterkennung für MaehrDocs
+Enthält die DuplicateDetector-Klasse zur Erkennung von ähnlichen Dokumenten
+mittels Textvergleich und Jaccard-Ähnlichkeit mit optimierter Verarbeitung für deutsche Texte.
 
 #### Klassen
 
-- `DuplicateDetector` - Keine Beschreibung verfügbar
+- `DuplicateDetector` - Klasse zur Erkennung von Dokumentduplikaten durch intelligenten Textvergleich.
   - Methoden:
-    - `calculate_similarity()` - Berechnet die Textähnlichkeit zwischen zwei Dokumenten
-    - `_tokenize()` - Text in Wörter aufteilen und bereinigen
+    - `calculate_similarity()` - Berechnet die Textähnlichkeit zwischen zwei Dokumenten mittels Jaccard-Ähnlichkeit.
+
+---
+
+### maehrdocs.error_handler
+
+**Dateipfad:** `maehrdocs\error_handler.py`
+
+Zentrale Fehlerbehandlung für MaehrDocs
+Bietet eine einheitliche Schnittstelle zur Fehlerbehandlung und -protokollierung
+
+#### Klassen
+
+- `ErrorHandler` - Zentrale Klasse zur Fehlerbehandlung in MaehrDocs.
+  - Methoden:
+    - `handle_exception()` - Behandelt eine Exception und leitet sie entsprechend weiter
+    - `try_except()` - Führt eine Funktion in einem try-except-Block aus
+    - `safe_operation()` - Context-Manager für fehleranfällige Operationen
 
 ---
 
@@ -138,28 +392,19 @@ Hauptklasse zur Verarbeitung von Dokumenten
 **Dateipfad:** `maehrdocs\file_operations.py`
 
 Dateioperationen für MaehrDocs
-Verwaltet alle Dateioperationen wie Verschieben, Kopieren und Löschen von Dateien
+Verwaltet alle Dateioperationen wie Verschieben, Kopieren, Umbenennen und Löschen
+von Dokumenten im Rahmen des Dokumentenmanagementsystems.
 
-#### Funktionen
-
-- `__init__()` - Initialisiert die Dateioperationen
-- `_ensure_directories_exist()` - Stellt sicher, dass alle erforderlichen Verzeichnisse existieren
-- `move_to_output()` - Verschiebt eine Datei in den Ausgabeordner mit neuem Namen
-- `move_to_trash()` - Verschiebt eine Datei in den Papierkorb
-- `get_input_files()` - Gibt eine Liste aller Dateien mit der angegebenen Endung im Eingangsordner zurück
-- `get_output_files()` - Gibt eine Liste aller Dateien mit der angegebenen Endung im Ausgabeordner zurück
-- `create_backup()` - Erstellt eine Sicherungskopie einer Datei
+Dieses Modul bietet eine zentrale Schnittstelle für alle dateibezogenen Operationen
+und stellt sicher, dass Dokumente konsistent und fehlerfrei zwischen den verschiedenen
+Systemordnern verschoben werden können, unter Berücksichtigung von Dateinamenskonflikten
+und anderen potenziellen Problemen.
 
 #### Klassen
 
-- `FileOperations` - Klasse zur Verwaltung von Dateioperationen
+- `FileOperations` - Klasse zur Verwaltung von Dateioperationen im Dokumentenmanagementsystem.
   - Methoden:
-    - `_ensure_directories_exist()` - Stellt sicher, dass alle erforderlichen Verzeichnisse existieren
-    - `move_to_output()` - Verschiebt eine Datei in den Ausgabeordner mit neuem Namen
-    - `move_to_trash()` - Verschiebt eine Datei in den Papierkorb
-    - `get_input_files()` - Gibt eine Liste aller Dateien mit der angegebenen Endung im Eingangsordner zurück
-    - `get_output_files()` - Gibt eine Liste aller Dateien mit der angegebenen Endung im Ausgabeordner zurück
-    - `create_backup()` - Erstellt eine Sicherungskopie einer Datei
+    - `move_to_output()` - Verschiebt eine Datei in den Ausgabeordner mit neuem Namen.
 
 ---
 
@@ -168,53 +413,17 @@ Verwaltet alle Dateioperationen wie Verschieben, Kopieren und Löschen von Datei
 **Dateipfad:** `maehrdocs\filename_generator.py`
 
 Dateinamengenerator für MaehrDocs
-Generiert standardisierte Dateinamen basierend auf extrahierten Dokumentinformationen
+Generiert standardisierte Dateinamen basierend auf extrahierten Dokumentinformationen.
 
-#### Funktionen
-
-- `__init__()` - Initialisiert den FilenameGenerator
-- `generate_filename()` - Generiert einen standardisierten Dateinamen basierend auf den extrahierten Informationen
-- `_format_date()` - Formatiert ein Datum im Format YYYY-MM-DD
-- `_format_document_type()` - Formatiert den Dokumenttyp
-- `_format_sender()` - Formatiert den Absender
-- `_format_subject()` - Formatiert den Betreff
+Dieses Modul implementiert die Logik zur Erzeugung konsistenter, strukturierter Dateinamen
+für verarbeitete Dokumente auf Basis der durch die KI-Analyse extrahierten Metadaten.
+Es sorgt für einheitliche Benennung und bessere Auffindbarkeit der Dokumente.
 
 #### Klassen
 
-- `FilenameGenerator` - Klasse zur Generierung standardisierter Dateinamen
+- `FilenameGenerator` - Klasse zur Generierung standardisierter Dateinamen für verarbeitete Dokumente.
   - Methoden:
-    - `generate_filename()` - Generiert einen standardisierten Dateinamen basierend auf den extrahierten Informationen
-    - `_format_date()` - Formatiert ein Datum im Format YYYY-MM-DD
-    - `_format_document_type()` - Formatiert den Dokumenttyp
-    - `_format_sender()` - Formatiert den Absender
-    - `_format_subject()` - Formatiert den Betreff
-
----
-
-### maehrdocs.gui.__init__
-
-**Dateipfad:** `maehrdocs\gui\__init__.py`
-
-GUI-Paket für MaehrDocs
-Enthält alle GUI-bezogenen Komponenten und Funktionalitäten
-
----
-
-### maehrdocs.gui.generate_module_docs
-
-**Dateipfad:** `maehrdocs\gui\generate_module_docs.py`
-
-MaehrDocs Modul-Dokumentations-Generator
-
-Durchsucht alle Python-Dateien im MaehrDocs-Paket und erstellt eine Markdown-Dokumentation 
-der Modulstruktur mit Funktionen und Klassen.
-
-#### Funktionen
-
-- `get_docstring()` - Extrahiert den Docstring aus einem AST-Knoten.
-- `analyze_python_file()` - Analysiert eine Python-Datei und extrahiert Funktionen, Klassen und deren Docstrings.
-- `generate_markdown()` - Generiert eine Markdown-Dokumentation der Module und deren Inhalte.
-- `generate_module_markdown()` - Generiert den Markdown-Abschnitt für ein bestimmtes Modul.
+    - `generate_filename()` - Generiert einen standardisierten Dateinamen basierend auf den extrahierten Informationen.
 
 ---
 
@@ -231,12 +440,19 @@ Enthält Funktionen zur Verarbeitung von Benutzeraktionen und Ereignissen
 
 **Dateipfad:** `maehrdocs\gui\gui_alerts.py`
 
+Benachrichtigungskomponenten für MaehrDocs
+Zentrale Schnittstelle für Systembenachrichtigungen und Dialogfenster.
+
+Dieses Modul dient als Kompatibilitätsschicht und leitet Aufrufe an die 
+spezialisierten Module wie gui_notifications.py und gui_animations.py weiter,
+um die Abwärtskompatibilität nach der Modularisierung zu gewährleisten.
+
 #### Funktionen
 
-- `show_success()` - Zeigt eine Erfolgs-Benachrichtigung an
-- `show_info()` - Zeigt eine Info-Benachrichtigung an
-- `show_warning()` - Zeigt eine Warnungs-Benachrichtigung an
-- `show_error()` - Zeigt eine Fehler-Benachrichtigung an
+- `show_success()` - Zeigt eine Erfolgs-Benachrichtigung an.
+- `show_info()` - Zeigt eine Informations-Benachrichtigung an.
+- `show_warning()` - Zeigt eine Warnungs-Benachrichtigung an.
+- `show_error()` - Zeigt eine Fehler-Benachrichtigung an.
 
 ---
 
@@ -244,11 +460,15 @@ Enthält Funktionen zur Verarbeitung von Benutzeraktionen und Ereignissen
 
 **Dateipfad:** `maehrdocs\gui\gui_animations.py`
 
+Animations- und Effektkomponenten für MaehrDocs GUI
+Enthält Funktionen für sanfte Übergänge und Animationen in der Benutzeroberfläche,
+wie Fade-In/Fade-Out-Effekte für Fenster und andere visuelle Elemente.
+
 #### Funktionen
 
-- `animate_window()` - Animiert das Erscheinen eines Fensters mit Fade-In-Effekt
-- `fade_in()` - Führt einen Fade-In-Effekt für ein Fenster durch
-- `fade_out()` - Führt einen Fade-Out-Effekt für ein Fenster durch
+- `animate_window()` - Animiert das Erscheinen eines Fensters mit Fade-In-Effekt.
+- `fade_in()` - Führt einen Fade-In-Effekt für ein Fenster durch.
+- `fade_out()` - Führt einen Fade-Out-Effekt für ein Fenster durch.
 
 ---
 
@@ -266,8 +486,6 @@ Enthält Funktionen zum Erstellen verschiedener Arten von Buttons
 - `create_toggle_button()` - Erstellt einen Toggle-Button, der zwischen zwei Zuständen wechseln kann
 - `_toggle_button_state()` - Hilfsfunktion zum Umschalten des Button-Zustands
 - `_create_tooltip()` - Erstellt einen einfachen Tooltip für ein Widget
-- `enter()` - Keine Beschreibung verfügbar
-- `leave()` - Keine Beschreibung verfügbar
 
 ---
 
@@ -306,24 +524,20 @@ Enthält Funktionen zur Ausführung von Befehlen in separaten Threads
 **Dateipfad:** `maehrdocs\gui\gui_core.py`
 
 Kernmodul der GUI-Anwendung für MaehrDocs
-Enthält die Hauptklasse GuiApp, die alle anderen GUI-Komponenten koordiniert
+Enthält die Hauptklasse GuiApp, die alle anderen GUI-Komponenten koordiniert und steuert.
 
-#### Funktionen
-
-- `__init__()` - Initialisiert die GUI mit Konfiguration und Dokumentenprozessor
-- `setup_gui()` - Richtet die GUI ein und gibt das Root-Fenster zurück
-- `open_folder()` - Öffnet den angegebenen Ordner im Datei-Explorer
-- `browse_folder()` - Öffnet einen Dialog zur Ordnerauswahl für ein Einstellungsfeld
-- `log()` - Fügt eine Nachricht zum Protokollbereich hinzu
+Dieses Modul dient als zentraler Einstiegspunkt für die grafische Benutzeroberfläche
+und verwaltet die Interaktion zwischen den verschiedenen GUI-Komponenten, dem Backend
+und der Anwendungskonfiguration.
 
 #### Klassen
 
-- `GuiApp` - Hauptklasse für die MaehrDocs GUI-Anwendung
+- `GuiApp` - Hauptklasse für die MaehrDocs GUI-Anwendung.
   - Methoden:
-    - `setup_gui()` - Richtet die GUI ein und gibt das Root-Fenster zurück
-    - `open_folder()` - Öffnet den angegebenen Ordner im Datei-Explorer
-    - `browse_folder()` - Öffnet einen Dialog zur Ordnerauswahl für ein Einstellungsfeld
-    - `log()` - Fügt eine Nachricht zum Protokollbereich hinzu
+    - `setup_gui()` - Richtet die GUI ein und erstellt alle UI-Komponenten.
+    - `open_folder()` - Öffnet den angegebenen Ordner im Datei-Explorer.
+    - `browse_folder()` - Öffnet einen Dialog zur Ordnerauswahl für ein Einstellungsfeld.
+    - `log()` - Fügt eine Nachricht zum Protokollbereich hinzu.
 
 ---
 
@@ -344,12 +558,19 @@ Erstellt das Dashboard mit Statuskarten und Aktivitätsanzeige
 
 **Dateipfad:** `maehrdocs\gui\gui_dialog.py`
 
+Dialog-Komponenten für MaehrDocs
+Enthält standardisierte Dialogfunktionen für Benutzerinteraktionen wie
+Bestätigungen, Informationen, Warnungen und Fehlermeldungen.
+
+Diese Dialoge verwenden das native Messagebox-Modul von Tkinter und
+sind im Stil der Anwendung gestaltet.
+
 #### Funktionen
 
-- `show_confirm_dialog()` - Zeigt einen Bestätigungsdialog an
-- `show_info_dialog()` - Zeigt einen Informationsdialog an
-- `show_error_dialog()` - Zeigt einen Fehlerdialog an
-- `show_warning_dialog()` - Zeigt einen Warnungsdialog an
+- `show_confirm_dialog()` - Zeigt einen Bestätigungsdialog mit Ja/Nein-Optionen an.
+- `show_info_dialog()` - Zeigt einen Informationsdialog mit einer OK-Schaltfläche an.
+- `show_error_dialog()` - Zeigt einen Fehlerdialog mit einem Fehlersymbol und einer OK-Schaltfläche an.
+- `show_warning_dialog()` - Zeigt einen Warnungsdialog mit einem Warnsymbol und einer OK-Schaltfläche an.
 
 ---
 
@@ -427,7 +648,6 @@ Enthält Funktionen zum Verarbeiten von Drag & Drop Ereignissen
 
 - `handle_drop()` - Verarbeitet gedropte Dateien
 - `copy_files_to_inbox()` - Kopiert Dateien in den Eingangsordner
-- `copy_thread()` - Keine Beschreibung verfügbar
 
 ---
 
@@ -477,7 +697,6 @@ Enthält Funktionen für die Anzeige von Hilfetexten und -informationen
 - `get_features_help()` - Liefert den Hilfetext für die Funktionen
 - `get_tutorial_help()` - Liefert den Hilfetext für die Anleitung
 - `get_troubleshooting_help()` - Liefert den Hilfetext für die Fehlerbehebung
-- `change_tab()` - Keine Beschreibung verfügbar
 
 ---
 
@@ -486,14 +705,18 @@ Enthält Funktionen für die Anzeige von Hilfetexten und -informationen
 **Dateipfad:** `maehrdocs\gui\gui_layout.py`
 
 Layout-Komponenten für MaehrDocs GUI
-Enthält Funktionen zum Erstellen der Hauptlayout-Komponenten
+Enthält Funktionen zur strukturierten Erstellung der Hauptlayout-Bereiche der Anwendung:
+Header, Steuerungspanel, Protokollbereich und Statusleiste.
+
+Diese Module bilden das visuelle Grundgerüst der Anwendung und stellen eine konsistente
+Benutzeroberfläche sicher, die den Design-Standards der MaehrDocs-Anwendung entspricht.
 
 #### Funktionen
 
-- `create_header()` - Erstellt den Kopfbereich der GUI
-- `create_control_panel()` - Erstellt das Steuerungspanel
-- `create_log_panel()` - Erstellt den Protokollbereich
-- `create_status_bar()` - Erstellt die Statusleiste am unteren Rand
+- `create_header()` - Erstellt den Kopfbereich der GUI mit Logo, Titel und Funktionsschaltflächen.
+- `create_control_panel()` - Erstellt das Steuerungspanel mit den Hauptfunktionsschaltflächen.
+- `create_log_panel()` - Erstellt den Protokollbereich für Statusmeldungen und Aktivitätslogs.
+- `create_status_bar()` - Erstellt die Statusleiste am unteren Rand der Anwendung.
 
 ---
 
@@ -502,14 +725,36 @@ Enthält Funktionen zum Erstellen der Hauptlayout-Komponenten
 **Dateipfad:** `maehrdocs\gui\gui_logger.py`
 
 Logging-Funktionalität für MaehrDocs GUI
-Enthält Funktionen zum Protokollieren von Nachrichten
+Implementiert ein visuelles Logging-System mit farblicher Hervorhebung verschiedener
+Log-Levels (Info, Warnung, Fehler, Erfolg) und Integration in die GUI-Komponenten.
+
+Dieses Modul verbindet das Python-Standard-Logging mit der grafischen Benutzeroberfläche
+und sorgt für konsistente und gut sichtbare Statusmeldungen während der Anwendungsausführung.
 
 #### Funktionen
 
-- `setup_logging()` - Richtet die Tags für das Logging ein
-- `log_message()` - Fügt eine Nachricht zum Protokollbereich hinzu
-- `update_activity_display()` - Aktualisiert die Aktivitätsanzeige mit der neuesten Nachricht
-- `export_log()` - Exportiert das aktuelle Protokoll in eine Datei
+- `setup_logging()` - Richtet die Tags für das Logging im Textfeld ein und konfiguriert die Formatierung.
+- `log_message()` - Fügt eine formatierte Nachricht zum Protokollbereich der GUI hinzu.
+- `update_activity_display()` - Aktualisiert die Aktivitätsanzeige im Dashboard mit der neuesten Nachricht.
+- `export_log()` - Exportiert das aktuelle Protokoll in eine Textdatei.
+
+---
+
+### maehrdocs.gui.gui_messaging
+
+**Dateipfad:** `maehrdocs\gui\gui_messaging.py`
+
+Zentrales Messaging-System für MaehrDocs
+Bietet eine einheitliche Schnittstelle für alle Arten von Benachrichtigungen, 
+Dialogen und Feedback-Mechanismen in der Anwendung.
+
+#### Klassen
+
+- `MessagingSystem` - Zentrale Klasse für alle Benachrichtigungen und Dialoge.
+  - Methoden:
+    - `notify()` - Zeigt eine Benachrichtigung an und/oder protokolliert sie.
+    - `dialog()` - Zeigt einen Dialogfenster an.
+    - `update_status()` - Aktualisiert die Statusleiste.
 
 ---
 
@@ -564,77 +809,123 @@ für die Abwärtskompatibilität.
 
 ---
 
-### maehrdocs.gui.gui_settings_components
+### maehrdocs.import_analyzer
 
-**Dateipfad:** `maehrdocs\gui\gui_settings_components.py`
+**Dateipfad:** `maehrdocs\import_analyzer.py`
 
-Einstellungskomponenten für MaehrDocs GUI
-Enthält Funktionen zum Erstellen von Einstellungssektionen und -tabs
+Import-Analysator für MaehrDocs
+
+Hauptmodul des Import-Analysators, das die Analyse von Importabhängigkeiten 
+und die Erkennung von zirkulären Imports koordiniert.
 
 #### Funktionen
 
-- `create_settings_section()` - Erstellt einen Abschnitt in den Einstellungen
-- `create_settings_tab()` - Erstellt einen Tab in den Einstellungen
-- `collect_settings_from_widget()` - Sammelt rekursiv alle Einstellungen aus Widgets
-- `search_and_update_field()` - Durchsucht ein Widget nach einem Feld und aktualisiert dessen Wert
+- `analyze_project()` - Analysiert ein Python-Projekt auf Importabhängigkeiten und zirkuläre Imports.
+- `main()` - Hauptfunktion, wenn das Modul als Skript ausgeführt wird.
 
 ---
 
-### maehrdocs.gui.gui_settings_dialog
+### maehrdocs.import_analyzer_core
 
-**Dateipfad:** `maehrdocs\gui\gui_settings_dialog.py`
+**Dateipfad:** `maehrdocs\import_analyzer_core.py`
 
-Einstellungsdialog für MaehrDocs
-Erstellt ein Fenster zur Konfiguration der Anwendung
+Kernfunktionalität des Import-Analysators für MaehrDocs
 
-#### Funktionen
+Dieses Modul bildet das Herzstück des Import-Analysators und enthält die Hauptklasse 
+ImportAnalyzer. Diese Klasse ist verantwortlich für das Scannen eines Python-Projekts, 
+die Verarbeitung der einzelnen Python-Dateien, die Extraktion der Importabhängigkeiten 
+und die Erkennung von zirkulären Importabhängigkeiten, die zu Laufzeitproblemen führen 
+können.
 
-- `open_settings()` - Öffnet das Einstellungsfenster
-- `create_general_tab()` - Erstellt den Tab für allgemeine Einstellungen
-- `create_openai_tab()` - Erstellt den Tab für OpenAI-Einstellungen
-- `create_document_tab()` - Erstellt den Tab für Dokumentverarbeitungseinstellungen
-- `create_notifications_tab()` - Erstellt den Tab für Benachrichtigungseinstellungen
-- `save_settings()` - Speichert die Einstellungen aus dem Einstellungsfenster
-- `browse_folder()` - Öffnet einen Dialog zur Ordnerauswahl für ein Einstellungsfeld
-
----
-
-### maehrdocs.gui.gui_toast
-
-**Dateipfad:** `maehrdocs\gui\gui_toast.py`
-
-#### Funktionen
-
-- `show_toast()` - Zeigt einen Toast an und gibt das Fenster zurück
-- `__init__()` - Erstellt eine neue Toast-Benachrichtigung
-- `show()` - Zeigt den Toast an
+Der Analyseprozess erfolgt in mehreren Stufen:
+1. Rekursives Scannen des Projektv...
 
 #### Klassen
 
-- `Toast` - Eine Toast-Benachrichtigung, die kurzzeitig am unteren Bildschirmrand erscheint
+- `ImportAnalyzer` - Hauptklasse für die Analyse von Importabhängigkeiten in Python-Projekten.
   - Methoden:
-    - `show()` - Zeigt den Toast an
+    - `scan_project()` - Durchsucht das Projektverzeichnis nach Python-Dateien und analysiert deren Imports.
+    - `get_module_details()` - Gibt detaillierte Informationen zu einem bestimmten Modul zurück.
 
 ---
 
-### maehrdocs.gui.gui_utils
+### maehrdocs.import_analyzer_graph
 
-**Dateipfad:** `maehrdocs\gui\gui_utils.py`
+**Dateipfad:** `maehrdocs\import_analyzer_graph.py`
 
-Hilfsfunktionen für MaehrDocs GUI
-Enthält verschiedene Hilfsfunktionen für die GUI
+Graph-Funktionalität des Import-Analysators für MaehrDocs
+
+Dieses Modul bietet eine Graph-basierte Darstellung von Modulabhängigkeiten
+und Funktionen zur Analyse und Visualisierung dieser Abhängigkeitsstrukturen.
+Es implementiert eine DependencyGraph-Klasse, die einen gerichteten Graphen
+repräsentiert, sowie Hilfsfunktionen zum Aufbau und zur Visualisierung des Graphen.
+
+Die Graph-Repräsentation ermöglicht:
+- Einfache Navigation durch Abhängigkeitsbeziehungen
+- Analyse der Modularchitektur
+- ...
 
 #### Funktionen
 
-- `update_dashboard()` - Aktualisiert die Anzeigen im Dashboard
-- `open_folder_in_explorer()` - Öffnet den angegebenen Ordner im Datei-Explorer
-- `setup_drag_drop()` - Richtet Drag & Drop-Funktionalität ein (erfordert tkinterdnd2)
-- `clear_log()` - Löscht den Inhalt des Protokolls
-- `check_for_new_documents()` - Prüft periodisch, ob neue Dokumente im Eingangsordner liegen
-- `create_directory_structure()` - Erstellt die Verzeichnisstruktur für die Anwendung
-- `get_file_count()` - Zählt die Anzahl der Dateien mit der angegebenen Endung im Verzeichnis
-- `format_timestamp()` - Erstellt einen formatierten Zeitstempel
-- `is_valid_path()` - Prüft, ob der angegebene Pfad gültig ist
+- `build_dependency_graph()` - Erstellt einen Abhängigkeitsgraphen aus Modulen und ihren Imports.
+- `visualize_graph()` - Erstellt eine visuelle Darstellung des Abhängigkeitsgraphen.
+
+#### Klassen
+
+- `DependencyGraph` - Repräsentiert einen gerichteten Graphen von Modulabhängigkeiten.
+  - Methoden:
+    - `add_node()` - Fügt einen Knoten (Modul) zum Graphen hinzu.
+    - `add_edge()` - Fügt eine gerichtete Kante (Abhängigkeit) zwischen zwei Modulen hinzu.
+    - `get_dependencies()` - Gibt alle direkten Abhängigkeiten (Imports) eines Moduls zurück.
+    - `get_dependents()` - Gibt alle Module zurück, die das angegebene Modul importieren (abhängige Module).
+    - `find_cycles()` - Findet alle Zyklen (zirkuläre Abhängigkeiten) im Abhängigkeitsgraphen.
+
+---
+
+### maehrdocs.import_analyzer_parser
+
+**Dateipfad:** `maehrdocs\import_analyzer_parser.py`
+
+Parser-Funktionalität des Import-Analysators für MaehrDocs
+
+Dieses Modul ist verantwortlich für das Parsen von Python-Dateien und das Extrahieren 
+von Import-Anweisungen. Es verwendet primär das AST-Modul (Abstract Syntax Tree) für 
+präzise Codeanalyse und bietet Fallback-Mechanismen mit regulären Ausdrücken für Dateien 
+mit Syntaxfehlern.
+
+Hauptfunktionalitäten:
+- Extrahieren aller Import-Anweisungen aus Python-Quellcode
+- Behandlung verschiedener Import-Typen (import, from-import)
+- Extrakt...
+
+#### Funktionen
+
+- `parse_imports()` - Parst Python-Code und extrahiert alle Importanweisungen.
+- `_parse_imports_with_regex()` - Fallback-Methode zum Extrahieren von Imports mit regulären Ausdrücken.
+- `extract_module_name()` - Extrahiert den vollqualifizierten Modulnamen aus einem Dateipfad.
+- `is_relative_import()` - Überprüft, ob ein Import-Statement ein relativer Import ist.
+
+---
+
+### maehrdocs.import_analyzer_report
+
+**Dateipfad:** `maehrdocs\import_analyzer_report.py`
+
+Berichterstellung und Lösungsvorschläge für den Import-Analysator
+
+Dieses Modul ist verantwortlich für die Aufbereitung und Präsentation der
+Analyseergebnisse in lesbaren Berichten und die Generierung von konkreten
+Lösungsvorschlägen für identifizierte Probleme. Es stellt zwei Hauptfunktionen bereit:
+
+1. generate_report - Erstellt einen umfassenden Analysebericht im Markdown-Format
+   mit Übersichten, Statistiken und detaillierten Modulinformationen
+   
+2. suggest_solutions - Generiert maßges...
+
+#### Funktionen
+
+- `generate_report()` - Erstellt einen detaillierten Bericht über die Importabhängigkeiten eines Projekts.
+- `suggest_solutions()` - Generiert maßgeschneiderte Lösungsvorschläge für zirkuläre Importabhängigkeiten.
 
 ---
 
@@ -658,37 +949,17 @@ Enthält die Kommandozeilenargumente und die CLI-Logik
 **Dateipfad:** `maehrdocs\openai_integration.py`
 
 OpenAI-Integration für MaehrDocs
-Verwaltet die Interaktion mit der OpenAI API
+Implementiert die Integration mit der OpenAI API für die Analyse von Dokumenteninhalten.
 
-#### Funktionen
-
-- `__init__()` - Initialisiert die OpenAI-Integration
-- `analyze_document()` - Analysiert einen Dokumenttext mit der OpenAI API
-- `_create_analysis_prompt()` - Erstellt den Prompt für die Dokumentanalyse
-- `_call_openai_api()` - Ruft die OpenAI API auf
-- `_parse_json_response()` - Parst die JSON-Antwort der API
+Dieses Modul kapselt alle Interaktionen mit der OpenAI API und bietet robuste
+Fehlerbehandlung, Wiederholungslogik und strukturierte Antwortverarbeitung.
+Es ist ein zentraler Bestandteil der KI-gestützten Dokumentenverarbeitung.
 
 #### Klassen
 
-- `OpenAIIntegration` - Klasse zur Interaktion mit der OpenAI API
+- `OpenAIIntegration` - Klasse zur Interaktion mit der OpenAI API.
   - Methoden:
-    - `analyze_document()` - Analysiert einen Dokumenttext mit der OpenAI API
-    - `_create_analysis_prompt()` - Erstellt den Prompt für die Dokumentanalyse
-    - `_call_openai_api()` - Ruft die OpenAI API auf
-    - `_parse_json_response()` - Parst die JSON-Antwort der API
-
----
-
-### maehrdocs.start_maehrdocs
-
-**Dateipfad:** `maehrdocs\start_maehrdocs.py`
-
-Starter-Skript für MaehrDocs
-Startet die GUI der Anwendung
-
-#### Funktionen
-
-- `main()` - Hauptfunktion zum Starten der GUI
+    - `analyze_document()` - Analysiert einen Dokumenttext mit der OpenAI API.
 
 ---
 
@@ -697,21 +968,20 @@ Startet die GUI der Anwendung
 **Dateipfad:** `maehrdocs\text_extractor.py`
 
 Textextraktion aus PDF-Dokumenten für MaehrDocs
+Enthält die TextExtractor-Klasse zum sicheren Extrahieren von Text und Metadaten
+aus PDF-Dokumenten unter Berücksichtigung verschiedener Fehlerszenarien.
 
-#### Funktionen
-
-- `__init__()` - Initialisiert den TextExtractor
-- `extract_text_from_pdf()` - Extrahiert Text aus einer PDF-Datei
-- `get_pdf_metadata()` - Extrahiert Metadaten aus einer PDF-Datei
-- `is_valid_pdf()` - Prüft, ob eine Datei eine gültige PDF ist und die Größenbeschränkung einhält
+Dieses Modul ist ein zentraler Bestandteil der Dokumentenverarbeitung und
+stellt sicher, dass Textinhalte zuverlässig aus PDFs extrahiert werden können,
+bevor sie zur weiteren Analyse an die KI-Komponenten übergeben werden.
 
 #### Klassen
 
-- `TextExtractor` - Klasse zur Extraktion von Text aus PDF-Dokumenten
+- `TextExtractor` - Klasse zur Extraktion von Text aus PDF-Dokumenten.
   - Methoden:
-    - `extract_text_from_pdf()` - Extrahiert Text aus einer PDF-Datei
-    - `get_pdf_metadata()` - Extrahiert Metadaten aus einer PDF-Datei
-    - `is_valid_pdf()` - Prüft, ob eine Datei eine gültige PDF ist und die Größenbeschränkung einhält
+    - `extract_text_from_pdf()` - Extrahiert Text aus einer PDF-Datei.
+    - `get_pdf_metadata()` - Extrahiert Metadaten aus einer PDF-Datei.
+    - `is_valid_pdf()` - Prüft, ob eine Datei eine gültige PDF ist und die Größenbeschränkung einhält.
 
 ---
 
