@@ -1,0 +1,24 @@
+document_processing:
+  max_file_size_mb: 20
+  similarity_threshold: 0.85
+  valid_doc_types:
+  - rechnung
+  - vertrag
+  - brief
+  - meldung
+  - bescheid
+  - dokument
+  - antrag
+gui:
+  enable_sounds: false
+  notify_on_completion: true
+  notify_on_new_documents: true
+  show_duplicate_popup: true
+openai:
+  max_retries: 3
+  model: gpt-3.5-turbo
+  temperature: 0.3
+paths:
+  input_dir: C:\Users\renem\OneDrive\09_AutoDocs\01_InboxDocs
+  output_dir: C:\Users\renem\OneDrive\09_AutoDocs\02_FinalDocs
+  trash_dir: C:\Users\renem\OneDrive\09_AutoDocs\03_TrashDocs

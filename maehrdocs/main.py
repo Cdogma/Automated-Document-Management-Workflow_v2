@@ -1,151 +1,158 @@
-#!/usr/bin/env python
 """
 Haupteinstiegspunkt für MaehrDocs
 Enthält die Kommandozeilenargumente und die CLI-Logik
 """
 
-import argparse
-import logging
 import os
 import sys
+import argparse
+import logging
 import time
+from datetime import datetime
 
-# Füge das übergeordnete Verzeichnis zum Pythonpfad hinzu, um maehrdocs als Paket zu importieren
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-sys.path.insert(0, parent_dir)
-
-# Logging einrichten
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('maehrdocs.log', encoding='utf-8')
-    ]
-)
-
-# Importiere notwendige Module
-try:
-    # Jetzt sollte der Import funktionieren
-    from maehrdocs import ConfigManager, DocumentProcessor
-except ImportError as e:
-    logging.error(f"Fehler beim Importieren der Module: {str(e)}")
-    print(f"Fehler: {str(e)}")
-    print("Stellen Sie sicher, dass Sie sich im richtigen Verzeichnis befinden und alle Abhängigkeiten installiert sind.")
-    sys.exit(1)
+from maehrdocs.config import ConfigManagerExtended
+from maehrdocs.document_processor import DocumentProcessor
+from maehrdocs.error_handler import ErrorHandler
 
 def parse_arguments():
     """
     Parst die Kommandozeilenargumente
-    
+
     Returns:
         argparse.Namespace: Die geparsten Argumente
     """
-    parser = argparse.ArgumentParser(description='MaehrDocs - Automatisches Dokumentenmanagementsystem')
+    parser = argparse.ArgumentParser(description='MaehrDocs - Dokumentenmanagementsystem')
     
-    # Optionale Argumente
-    parser.add_argument('--dry-run', action='store_true', 
-                      help='Simulation ohne tatsächliche Änderungen')
-    parser.add_argument('--single-file', type=str, metavar='FILE',
-                      help='Verarbeitet eine einzelne PDF-Datei statt des Eingangsordners')
-    parser.add_argument('--rebuild-config', action='store_true',
-                      help='Erstellt die Konfigurationsdatei neu mit Standardwerten')
-    parser.add_argument('--force', action='store_true',
-                      help='Überschreibt vorhandene Dateien ohne Rückfrage')
+    # Allgemeine Optionen
     parser.add_argument('-v', '--verbose', action='count', default=0,
-                      help='Erhöht die Ausführlichkeit der Ausgabe (verwende -vv für noch mehr Details)')
+                        help='Erhöht die Ausführlichkeit der Ausgabe (kann mehrfach verwendet werden)')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='Simuliert die Verarbeitung ohne Dateioperationen')
+    
+    # Verschiedene Modi
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--process', action='store_true',
+                      help='Verarbeitet alle PDF-Dokumente im Eingangsordner')
+    group.add_argument('--file', metavar='FILE',
+                      help='Verarbeitet eine einzelne PDF-Datei')
+    group.add_argument('--config', action='store_true',
+                      help='Zeigt die aktuelle Konfiguration an')
+    group.add_argument('--reset-config', action='store_true',
+                      help='Setzt die Konfiguration zurück')
     
     return parser.parse_args()
 
 def setup_logging(verbose_level):
     """
     Richtet das Logging basierend auf der Ausführlichkeitsstufe ein
-    
+
     Args:
-        verbose_level: Ausführlichkeitsstufe (0=normal, 1=verbose, 2=debug)
+        verbose_level (int): Die Ausführlichkeitsstufe (0-2)
     """
-    # Logging-Level basierend auf der Ausführlichkeitsstufe festlegen
-    if verbose_level >= 2:
-        logging.getLogger().setLevel(logging.DEBUG)
-    elif verbose_level >= 1:
-        logging.getLogger().setLevel(logging.INFO)
-    else:
-        logging.getLogger().setLevel(logging.WARNING)
+    log_levels = {
+        0: logging.WARNING,  # Standardlevel
+        1: logging.INFO,     # -v
+        2: logging.DEBUG     # -vv
+    }
     
-    logging.info(f"Logging-Level gesetzt auf: {logging.getLogger().getEffectiveLevel()}")
+    # Sicherstellen, dass verbose_level im gültigen Bereich liegt
+    if verbose_level > max(log_levels.keys()):
+        verbose_level = max(log_levels.keys())
+    
+    # Logging konfigurieren
+    log_level = log_levels.get(verbose_level, logging.WARNING)
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(),  # Konsolenausgabe
+            logging.FileHandler(f'maehrdocs_{datetime.now().strftime("%Y%m%d")}.log')  # Dateiausgabe
+        ]
+    )
 
 def main():
     """
     Hauptfunktion des Programms
+    Verarbeitet die Argumente und führt die entsprechende Aktion aus
     """
+    # Argumente parsen
+    args = parse_arguments()
+    
+    # Logging einrichten
+    setup_logging(args.verbose)
+    logger = logging.getLogger(__name__)
+    
+    # Begrüßungsmeldung
+    logger.info("MaehrDocs - Dokumentenmanagementsystem")
+    logger.info(f"Ausführung gestartet: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    
+    # Zeit messen
+    start_time = time.time()
+    
     try:
-        # Argumente parsen
-        args = parse_arguments()
-        
-        # Logging einrichten
-        setup_logging(args.verbose)
-        
-        # Konfiguration laden oder neu erstellen
-        config_manager = ConfigManager()
-        
-        # Wenn die Konfiguration neu erstellt werden soll
-        if args.rebuild_config:
-            logging.info("Erstelle Konfigurationsdatei neu...")
-            config = config_manager.create_default_config()
-            config_manager.save_config(config)
-            logging.info("Konfigurationsdatei wurde neu erstellt.")
-            return
-        
         # Konfiguration laden
+        config_manager = ConfigManagerExtended()
         config = config_manager.get_config()
         
-        # Dokumentenprozessor erstellen
+        # Konfigurationsbezogene Aktionen
+        if args.config:
+            # Zeige die Konfiguration an
+            import yaml
+            print(yaml.dump(config, default_flow_style=False))
+            return
+        elif args.reset_config:
+            # Konfiguration zurücksetzen
+            config_manager.reset_config()
+            logger.info("Konfiguration wurde zurückgesetzt.")
+            return
+        
+        # DocumentProcessor initialisieren
         document_processor = DocumentProcessor(config)
         
-        # Verbosity-Level setzen
-        document_processor.verbose = args.verbose
-        
-        # Force-Option setzen
-        document_processor.force = args.force
-        
-        # Einzelne Datei verarbeiten
-        if args.single_file:
-            file_path = args.single_file
-            if not os.path.exists(file_path):
-                logging.error(f"Datei nicht gefunden: {file_path}")
+        # Verarbeitungsaktionen
+        results = []
+        if args.file:
+            # Einzelnes Dokument verarbeiten
+            if not os.path.exists(args.file):
+                logger.error(f"Die angegebene Datei existiert nicht: {args.file}")
                 return
-                
-            logging.info(f"Verarbeite einzelne Datei: {file_path}")
-            result = document_processor.process_document(file_path, dry_run=args.dry_run)
             
+            result = document_processor.process_document(args.file, dry_run=args.dry_run)
             if result:
-                logging.info(f"Dokument verarbeitet: {result['new_filename']}")
-                if result.get('is_duplicate', False):
-                    logging.warning(f"Duplikat erkannt: Ähnlich zu {result['duplicate_path']}")
-            else:
-                logging.error(f"Fehler bei der Verarbeitung von {file_path}")
-        
-        # Alle Dokumente im Eingangsordner verarbeiten
-        else:
-            mode = "Simulation" if args.dry_run else "Verarbeitung"
-            logging.info(f"{mode} aller Dokumente im Eingangsordner gestartet...")
+                results.append(result)
+        elif args.process or not any([args.config, args.reset_config, args.file]):
+            # Standard: Alle Dokumente im Eingangsordner verarbeiten
+            input_dir = config.get('paths', {}).get('input_dir', '')
             
-            start_time = time.time()
-            results = document_processor.process_all_documents(dry_run=args.dry_run)
-            end_time = time.time()
+            if not os.path.exists(input_dir):
+                logger.error(f"Der Eingangsordner existiert nicht: {input_dir}")
+                return
             
-            if results:
-                logging.info(f"{len(results)} Dokumente verarbeitet in {end_time - start_time:.2f} Sekunden.")
-            else:
-                logging.warning("Keine Dokumente verarbeitet oder Fehler aufgetreten.")
+            # Über alle Dateien im Eingangsordner iterieren
+            for filename in os.listdir(input_dir):
+                file_path = os.path.join(input_dir, filename)
+                # Nur Dateien verarbeiten, keine Verzeichnisse
+                if os.path.isfile(file_path):
+                    # Einzelnes Dokument verarbeiten
+                    result = document_processor.process_document(file_path, dry_run=args.dry_run)
+                    if result:
+                        results.append(result)
         
-    except KeyboardInterrupt:
-        logging.info("Programm durch Benutzer abgebrochen.")
+        # Zusammenfassung ausgeben
+        if args.process or args.file or not any([args.config, args.reset_config]):
+            logger.info(f"Verarbeitung abgeschlossen. {len(results)} Dokumente verarbeitet.")
+            if args.dry_run:
+                logger.info("Simulationsmodus: Es wurden keine Dateioperationen durchgeführt.")
+        
     except Exception as e:
-        logging.error(f"Fehler: {str(e)}", exc_info=True)
-        print(f"Fehler: {str(e)}")
+        error_handler = ErrorHandler()
+        error_handler.handle_exception(e)
+        logger.error(f"Fehler: {str(e)}")
         return 1
+    
+    # Zeitauswertung
+    total_time = time.time() - start_time
+    logger.info(f"Gesamtlaufzeit: {total_time:.2f} Sekunden")
     
     return 0
 

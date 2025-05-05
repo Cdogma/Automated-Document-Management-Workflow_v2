@@ -173,15 +173,15 @@ class GuiApp:
             self.status_elements = create_status_bar(self, self.main_frame)
             self.status_label = self.status_elements["status_label"]
             
-            # Logging einrichten
-            setup_logging(self)
-            
-            # Messaging-System initialisieren (NACH der GUI-Erstellung)
+            # Messaging-System initialisieren (VOR dem Logging-Setup)
             from .gui_messaging import MessagingSystem
             self.messaging = MessagingSystem(self)
             
             # ErrorHandler aktualisieren, um das jetzt verfügbare Messaging-System zu nutzen
             self.error_handler.app = self
+            
+            # Logging einrichten (JETZT NACH dem Messaging-System)
+            setup_logging(self)
             
             # Dashboard aktualisieren
             update_dashboard(self)
