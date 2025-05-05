@@ -176,7 +176,7 @@ class GuiApp:
             setup_logging(self)
             
             # Messaging-System initialisieren (NACH der GUI-Erstellung)
-            from .messaging import MessagingSystem
+            from .gui_messaging import MessagingSystem
             self.messaging = MessagingSystem(self)
             
             # ErrorHandler aktualisieren, um das jetzt verfügbare Messaging-System zu nutzen
