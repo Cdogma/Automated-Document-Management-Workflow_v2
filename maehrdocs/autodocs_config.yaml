@@ -26,25 +26,33 @@ paths:
   input_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\01_InboxDocs"
   output_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\02_FinalDocs"
   trash_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\03_TrashDocs"
-  log_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\04_Logs"  # Neuer Ordner für Protokolle
+  log_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\04_Logs"  # Ordner für Protokolle
+  processed_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\04_ProcessedInboxDocs"  # Neuer Ordner für verarbeitete Dokumente
 
 # OpenAI API-Einstellungen
 openai:
-  model: "gpt-3.5-turbo"  # Alternativ: gpt-4o für höhere Präzision
-  temperature: 0.3  # Niedrigere Temperatur für konsistentere Ergebnisse
-  max_retries: 3  # Anzahl der Wiederholungsversuche bei API-Fehlern
+  model: "gpt-4o"  # Leistungsstärkeres Modell für präzisere Dokumentenanalyse
+  temperature: 0.2  # Niedrige Temperatur für höhere Präzision
+  max_retries: 5  # Erhöhte Anzahl der Wiederholungsversuche bei API-Fehlern
   api_key_env: "OPENAI_API_KEY"  # Name der Umgebungsvariable für den API-Schlüssel
-  system_prompt: "Du bist ein präziser Dokumentenanalyst. Extrahiere relevante Informationen aus dem folgenden Dokument und gib sie im angeforderten Format zurück."
+  system_prompt: "Du bist ein Experte für automatisierte Dokumentenverarbeitung mit Schwerpunkt auf deutschsprachigen Geschäftsdokumenten. Deine Aufgabe ist es, folgende Informationen präzise zu extrahieren und im JSON-Format zurückzugeben:
+1. absender: Identifiziere den genauen Firmennamen/Behörde/Person inkl. Rechtsform.
+2. datum: Erkenne das relevanteste Datum (Rechnungsdatum, Vertragsdatum, Briefdatum) im Format YYYY-MM-DD.
+3. dokumenttyp: Kategorisiere das Dokument eindeutig in eine der vorgegebenen Typen.
+4. betreff: Extrahiere den Kern-Betreff oder Hauptzweck des Dokuments in maximal 10 Wörtern.
+5. kennzahlen: Erfasse wichtige numerische Werte wie Rechnungsnummer, Kundennummer, Betrag (mit Währung), Steuerbeträge.
+
+Beachte typische Strukturelemente wie Briefkopf, Betreffzeile, Anrede, formelle Schlussformeln. Bei Unklarheiten wähle die präziseste mögliche Kategorisierung und gib Sicherheitsstufen in Prozent an."
 
 # Dokumentverarbeitungseinstellungen
 document_processing:
-  max_file_size_mb: 20  # Maximale Dateigröße in MB
+  max_file_size_mb: 25  # Maximale Dateigröße in MB
   similarity_threshold: 0.85  # Schwellenwert für Duplikaterkennung (0.0 - 1.0)
-  max_pages_to_analyze: 20  # Maximale Anzahl zu analysierender Seiten bei großen Dokumenten
-  extract_images: false  # Bilder aus PDFs extrahieren (kann Performance beeinträchtigen)
-  ocr_enabled: false  # OCR für Dokumente ohne extrahierbaren Text aktivieren
+  max_pages_to_analyze: 25  # Maximale Anzahl zu analysierender Seiten bei großen Dokumenten
+  extract_images: true  # Bilder aus PDFs extrahieren für bessere Analyse
+  ocr_enabled: true  # OCR für Dokumente ohne extrahierbaren Text aktivieren
   
-  # Gültige Dokumenttypen
+  # Erweiterte Liste gültiger Dokumenttypen
   valid_doc_types:
     - rechnung
     - vertrag
@@ -56,10 +64,38 @@ document_processing:
     - angebot
     - mahnung
     - gutschrift
+    - gehaltsabrechnung
+    - versicherungspolice
+    - steuerbescheid
+    - lieferschein
+    - bestellung
+    - kündigungsbestätigung
+    - zertifikat
+    - protokoll
+    - bericht
+    - newsletter
+    - kontoauszug
+    - steuernachweis
+    - garantiebeleg
+    - bewerbung
+    - arbeitsvertrag
+    - mietvertrag
+    - abrechnung
+    - vollmacht
+    - einladung
+    - zeugnisdokument
 
   # Format für Dateinamen nach der Verarbeitung
   filename_format: "{datum}_{typ}_{absender}_{betreff}.pdf"
   date_format: "%Y-%m-%d"  # YYYY-MM-DD Format für Datum im Dateinamen
+  processed_file_prefix: "PROCESSED_{date}_"  # Präfix für verarbeitete Dateien mit Datum
+
+# Verarbeitungspipeline
+processing_pipeline:
+  perform_ocr_first: true  # OCR vor Textextraktion durchführen
+  extract_tables: true  # Tabellen als strukturierte Daten extrahieren
+  extract_metadata: true  # PDF-Metadaten für die Analyse berücksichtigen
+  use_keywords_list: true  # Keyword-basierte Vorfilterung nutzen
 
 # Erweiterte Duplikaterkennung
 duplicate_detection:
@@ -67,9 +103,29 @@ duplicate_detection:
   hash_compare: true  # Hash-basierter Vergleich für schnelle Erkennung exakter Duplikate
   content_compare: true  # Inhaltsvergleich für ähnliche Dokumente
   check_in_output_dir: true  # Auch im Ausgabeordner nach Duplikaten suchen
+  check_in_processed_dir: true  # Auch im Ordner für verarbeitete Dokumente nach Duplikaten suchen
   generate_report: true  # Duplikatbericht generieren
   report_format: "html"  # Format des Duplikatberichts (text, json, html)
   visual_comparison: true  # Visuellen Vergleich für gefundene Duplikate erstellen
+
+# Dateiversionsmanagement
+version_control:
+  enabled: true  # Änderungshistorie für Dokumente führen
+  max_versions: 3  # Maximale Anzahl alter Versionen
+  compare_versions: true  # Unterschiede zwischen Versionen anzeigen
+
+# Datenschutzeinstellungen
+privacy:
+  redact_sensitive_data: true  # Sensible Daten wie IBAN/Personalausweisnummer schwärzen
+  compliance_mode: "DSGVO"  # Datenschutzstandards einhalten
+  encryption_enabled: false  # Vertrauliche Dokumente verschlüsseln
+
+# KI-Performance-Optimierung
+ai_optimization:
+  context_window: 8000  # Maximale Textlänge für die API
+  batch_processing: true  # Dokumentenstapel gemeinsam analysieren
+  confidence_threshold: 0.75  # Mindestvertrauen für Extraktionen
+  retry_with_different_model: true  # Bei niedrigem Vertrauen präziseres Modell nutzen
 
 # GUI-Einstellungen
 gui:
@@ -116,7 +172,8 @@ automation:
 # Erweiterte Einstellungen
 advanced:
   debug_mode: false  # Debug-Modus aktivieren
-  keep_original_files: true  # Originaldateien behalten
+  keep_original_files: false  # Originaldateien nicht mehr behalten, da wir sie jetzt markieren und verschieben
+  mark_processed_files: true  # Neue Option: Verarbeitete Dateien markieren und verschieben
   temp_directory: ""  # Temporäres Verzeichnis (leer = Systemstandard)
   memory_limit_mb: 512  # Speicherlimit in MB für die Verarbeitung großer Dateien
   timeout_seconds: 60  # Zeitlimit für die Verarbeitung einer einzelnen Datei

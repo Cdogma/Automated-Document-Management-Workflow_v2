@@ -33,6 +33,8 @@ def setup_logging(app):
         app.log_text.tag_configure("warning", foreground=app.colors["warning"])
         app.log_text.tag_configure("success", foreground=app.colors["success"])
         app.log_text.tag_configure("info", foreground=app.colors["text_primary"])
+        # Neuer Tag für Duplikate
+        app.log_text.tag_configure("duplicate", foreground=app.colors["primary"])  # Blau für Duplikate
         app.log_text.tags_created = True
     
     app.log_text.config(state=tk.DISABLED)
@@ -48,7 +50,7 @@ def log_message(app, message, level="info"):
     Args:
         app: Die GuiApp-Instanz mit dem konfigurierten log_text-Widget
         message (str): Die zu protokollierende Nachricht
-        level (str): Log-Level ("info", "warning", "error", "success")
+        level (str): Log-Level ("info", "warning", "error", "success", "duplicate")
     """
     if not hasattr(app, 'log_text') or app.log_text is None:
         return
@@ -69,6 +71,10 @@ def log_message(app, message, level="info"):
     elif level == "success":
         tag = "success"
         prefix = "✅ ERFOLG"
+        log_level = logging.INFO
+    elif level == "duplicate":
+        tag = "duplicate"
+        prefix = "🔄 DUPLIKAT"  # Neues Symbol für Duplikate
         log_level = logging.INFO
     else:
         tag = "info"

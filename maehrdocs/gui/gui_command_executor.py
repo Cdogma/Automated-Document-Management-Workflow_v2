@@ -6,6 +6,7 @@ Enthält Funktionen zur Ausführung von Befehlen in separaten Threads
 import subprocess
 import threading
 from tkinter import messagebox
+from datetime import datetime
 
 def run_command_in_thread(app, command, env=None):
     """
@@ -50,12 +51,25 @@ def _run_command(app, command, env=None):
         
         # Ausgabe in Echtzeit verarbeiten
         for line in process.stdout:
-            app.log(line.strip())
+            line = line.strip()
             
-            # Auf Duplikate prüfen
-            if "DUPLICATE DETECTED" in line:
-                from .gui_notification_handlers import handle_duplicate_from_log
-                handle_duplicate_from_log(app, line)
+            # Auf spezielle Duplikatmarkierung prüfen
+            if "DUPLIKAT_ERKANNT|" in line:
+                # Duplikatinformationen extrahieren
+                parts = line.split("|")
+                if len(parts) >= 4:
+                    original_file = parts[1]
+                    duplicate_file = parts[2]
+                    similarity = parts[3]
+                    
+                    # Blau formatierte Duplikatmeldung
+                    duplikat_message = f"Duplikat erkannt: {duplicate_file} ist identisch mit {original_file} (Ähnlichkeit: {similarity})"
+                    
+                    # In das Log schreiben
+                    app.log(duplikat_message, level="duplicate")
+            else:
+                # Normale Ausgabe
+                app.log(line)
             
         # Auf Fehler prüfen
         for line in process.stderr:

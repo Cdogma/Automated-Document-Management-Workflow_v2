@@ -66,10 +66,54 @@ class FileOperations:
             self.logger.error(f"Fehler beim Erstellen der Verzeichnisse: {str(e)}")
     
     def move_to_output(self, file_path, new_filename, force=False):
-       
         """
         Verschiebt eine Datei in den Ausgabeordner mit neuem Namen.
         
         Implementiert intelligente Konfliktbehandlung, indem bei bereits
-        existierenden
-         """
+        existierenden Dateien automatisch ein Suffix hinzugefügt wird.
+        Bei aktivierter force-Option werden vorhandene Dateien überschrieben.
+        
+        Args:
+            file_path (str): Pfad zur Originaldatei
+            new_filename (str): Neuer vollständiger Zieldateiname (mit Pfad)
+            force (bool): Wenn True, werden vorhandene Dateien überschrieben
+            
+        Returns:
+            bool: True bei Erfolg, False bei Fehler
+        """
+        try:
+            # Prüfen, ob die Quelldatei existiert
+            if not os.path.exists(file_path):
+                self.logger.error(f"Quelldatei existiert nicht: {file_path}")
+                return False
+            
+            # Wenn die Zieldatei bereits existiert
+            if os.path.exists(new_filename):
+                if force:
+                    # Bei force=True vorhandene Datei überschreiben
+                    self.logger.info(f"Überschreibe vorhandene Datei: {new_filename}")
+                    os.remove(new_filename)
+                else:
+                    # Sonst ein Suffix hinzufügen
+                    base, ext = os.path.splitext(new_filename)
+                    counter = 1
+                    while os.path.exists(f"{base}_{counter}{ext}"):
+                        counter += 1
+                    new_filename = f"{base}_{counter}{ext}"
+                    self.logger.info(f"Datei existiert bereits, verwende alternativen Namen: {new_filename}")
+            
+            # Datei kopieren
+            shutil.copy2(file_path, new_filename)
+            
+            # Original löschen, wenn aktiviert
+            keep_original = self.config.get('advanced', {}).get('keep_original_files', False)
+            if not keep_original:
+                os.remove(file_path)
+                self.logger.debug(f"Quelldatei gelöscht: {file_path}")
+            
+            self.logger.info(f"Datei erfolgreich verschoben: {file_path} -> {new_filename}")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Fehler beim Verschieben der Datei {file_path} zu {new_filename}: {str(e)}")
+            return False

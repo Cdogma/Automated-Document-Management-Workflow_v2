@@ -1,4 +1,17 @@
-"""
+r"""
+    Prüft, ob das Dokument ein Duplikat eines bereits verarbeiteten Dokuments ist.
+    
+    Vergleicht den extrahierten Text mit den Texten bereits verarbeiteter Dokumente
+    im Ausgabeordner und berechnet Ähnlichkeitswerte, um Duplikate zu erkennen.
+    
+    Args:
+        text (str): Der extrahierte Text des Dokuments
+        file_path (str): Pfad zur Originaldatei
+        
+    Returns:
+        tuple: (is_duplicate, duplicate_path) - Ob es ein Duplikat ist und Pfad zum Original
+    """
+r"""
 DocumentProcessor für MaehrDocs
 Hauptklasse zur Verarbeitung von Dokumenten
 """
@@ -169,12 +182,11 @@ class DocumentProcessor:
                             is_duplicate = True
                             duplicate_path = compare_path
                             
-                            # Log und Benachrichtigung
-                            self.logger.warning(
-                                f"DUPLICATE DETECTED: [Original: {filename}] "
-                                f"[Duplicate: {os.path.basename(file_path)}] "
-                                f"[Similarity: {similarity:.2f}]"
-                            )
+                            # Spezielle Nachricht für Duplikaterkennung mit speziellem Präfix
+                            message = f"DUPLIKAT_ERKANNT|{filename}|{os.path.basename(file_path)}|{similarity:.2f}"
+                            print(message)  # Diese Zeile ist wichtig für die Erkennung im Stdout
+                            self.logger.info(message)
+                            
                             break
             
             return is_duplicate, duplicate_path

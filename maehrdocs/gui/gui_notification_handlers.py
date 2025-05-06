@@ -31,6 +31,9 @@ def handle_duplicate_from_log(app, log_line):
             similarity_str = log_line[similarity_start:similarity_end].strip()
             similarity_score = float(similarity_str)
             
+            # Log mit dem neuen Level
+            app.log(f"Duplikat erkannt: {duplicate_file} ist identisch mit {original_file} (Ähnlichkeit: {similarity_score:.2f})", level="duplicate")
+            
             # Popup anzeigen, wenn aktiviert
             if app.config.get("gui", {}).get("show_duplicate_popup", True):
                 from .gui_document_viewer import show_duplicate_alert
