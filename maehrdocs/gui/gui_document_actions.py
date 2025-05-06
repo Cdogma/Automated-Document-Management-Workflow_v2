@@ -75,3 +75,13 @@ def rebuild_config(app):
         env = os.environ.copy()
         env["PYTHONPATH"] = os.path.dirname(script_dir)
         run_command_in_thread(app, [sys.executable, main_script, "--rebuild-config"], env=env)
+
+def archive_monthly_documents(app):
+    """
+    Öffnet den Dialog zur monatlichen Archivierung von Dokumenten
+    
+    Args:
+        app: Instanz der GuiApp
+    """
+    from .gui_archive import show_archive_dialog
+    show_archive_dialog(app)

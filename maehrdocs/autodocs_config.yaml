@@ -26,8 +26,12 @@ paths:
   input_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\01_InboxDocs"
   output_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\02_FinalDocs"
   trash_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\03_TrashDocs"
-  log_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\04_Logs"  # Ordner für Protokolle
-  processed_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\04_ProcessedInboxDocs"  # Neuer Ordner für verarbeitete Dokumente
+  processed_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\04_Archived_InboxDocs"
+  business_docs_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\05_BusinessDocs"
+  excel_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\06_ExcelDocs"
+  payments_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\07_Payments_ReconciliationDocs"
+  backup_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\08_BackupDocs"
+  log_dir: "C:\\Users\\renem\\OneDrive\\09_AutoDocs\\09_LogDocs"
 
 # OpenAI API-Einstellungen
 openai:

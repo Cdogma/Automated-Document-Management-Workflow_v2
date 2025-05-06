@@ -1,6 +1,14 @@
 """
 DocumentProcessor für MaehrDocs
 Hauptklasse zur Verarbeitung von Dokumenten
+
+Diese Klasse koordiniert den gesamten Dokumentenverarbeitungsprozess:
+- Text aus PDF-Dokumenten extrahieren
+- KI-basierte Analyse und Informationsextraktion
+- Duplikaterkennung
+- Generierung neuer Dateinamen
+- Verschieben und Archivieren von Dokumenten
+- Excel-Integration
 """
 
 import os
@@ -13,6 +21,8 @@ from maehrdocs.file_operations import FileOperations
 from maehrdocs.filename_generator import FilenameGenerator
 from maehrdocs.duplicate_detector import DuplicateDetector
 from maehrdocs.duplicate_reporting import generate_duplicate_report
+from maehrdocs.document_archiver import archive_business_document
+from maehrdocs.excel_core import ExcelWriter
 
 class DocumentProcessor:
     """
@@ -104,13 +114,18 @@ class DocumentProcessor:
             
             # Wenn nicht im Simulationsmodus, führe die Dateioperationen aus
             if not dry_run:
-                self._move_file(file_path, new_filename, is_duplicate, force, duplicate_path)
+                moved_file_path = self._move_file(file_path, new_filename, is_duplicate, force, duplicate_path)
+                
+                # Dokument zur Excel-Tabelle hinzufügen, wenn nicht als Duplikat erkannt
+                if not is_duplicate and moved_file_path:
+                    self._add_to_excel(doc_info, moved_file_path)
             else:
                 self.logger.info(f"[SIMULATION] Würde Datei verschieben: {file_path} -> {new_filename}")
                 if is_duplicate:
                     self.logger.info(f"[SIMULATION] Dokument ist ein Duplikat von: {duplicate_path}")
                 else:
                     self.logger.info(f"[SIMULATION] Quelldatei würde als verarbeitet markiert werden")
+                    self.logger.info(f"[SIMULATION] Dokument würde zur Excel-Tabelle hinzugefügt werden")
             
             return result
             
@@ -123,8 +138,7 @@ class DocumentProcessor:
         Prüft, ob das Dokument ein Duplikat eines bereits verarbeiteten Dokuments ist.
         
         Vergleicht den extrahierten Text mit den Texten bereits verarbeiteter Dokumente
-        in den konfigurierten Verzeichnissen und berechnet Ähnlichkeitswerte, um 
-        Duplikate zu erkennen.
+        im Ausgabeordner und berechnet Ähnlichkeitswerte, um Duplikate zu erkennen.
         
         Args:
             text (str): Der extrahierte Text des Dokuments
@@ -139,71 +153,48 @@ class DocumentProcessor:
         
         # Einstellungen aus der Konfiguration laden
         threshold = self.config.get('document_processing', {}).get('similarity_threshold', 0.85)
-        duplicate_config = self.config.get('duplicate_detection', {})
+        check_output = self.config.get('duplicate_detection', {}).get('check_in_output_dir', True)
         
         # Wenn Duplikaterkennung deaktiviert ist, sofort zurückkehren
-        if not duplicate_config.get('enabled', True):
+        if not self.config.get('duplicate_detection', {}).get('enabled', True):
             return is_duplicate, duplicate_path
         
         try:
-            # Verzeichnisse für die Duplikatsuche
-            directories_to_check = []
-            
             # Ausgabeordner, falls überprüft werden soll
-            if duplicate_config.get('check_in_output_dir', True):
-                output_dir = self.config.get('paths', {}).get('output_dir', '')
-                if output_dir and os.path.exists(output_dir):
-                    directories_to_check.append(output_dir)
-            
-            # Processed_dir, falls überprüft werden soll
-            if duplicate_config.get('check_in_processed_dir', True):
-                processed_dir = self.config.get('paths', {}).get('processed_dir', '')
-                if processed_dir and os.path.exists(processed_dir):
-                    directories_to_check.append(processed_dir)
-            
-            # Alle konfigurierten Verzeichnisse durchsuchen
-            for directory in directories_to_check:
-                # Durchsuche alle PDF-Dateien im Verzeichnis
-                for filename in os.listdir(directory):
+            output_dir = self.config.get('paths', {}).get('output_dir', '')
+            if check_output and os.path.exists(output_dir):
+                # Dateien im Ausgabeordner durchsuchen
+                for filename in os.listdir(output_dir):
                     if filename.lower().endswith('.pdf'):
-                        compare_path = os.path.join(directory, filename)
+                        compare_path = os.path.join(output_dir, filename)
                         
                         # Eigene Datei überspringen (bei erneutem Verarbeiten)
                         if os.path.exists(file_path) and os.path.samefile(file_path, compare_path):
                             continue
                         
-                        # Hash-Vergleich, falls aktiviert
-                        if duplicate_config.get('hash_compare', True):
-                            # Hier könnte ein Hash-Vergleich eingefügt werden
-                            # Für jetzt überspringen wir diesen Schritt
-                            pass
+                        # Text aus Vergleichsdatei extrahieren
+                        compare_text = self.text_extractor.extract_text_from_pdf(compare_path)
+                        if not compare_text:
+                            continue
                         
-                        # Inhaltsvergleich, falls aktiviert
-                        if duplicate_config.get('content_compare', True):
-                            # Text aus Vergleichsdatei extrahieren
-                            compare_text = self.text_extractor.extract_text_from_pdf(compare_path)
-                            if not compare_text:
-                                continue
+                        # Ähnlichkeit berechnen
+                        similarity = self.duplicate_detector.calculate_similarity(text, compare_text)
+                        
+                        # Log für Debugging
+                        if self.verbose > 1:
+                            self.logger.debug(f"Ähnlichkeit mit {filename}: {similarity:.4f}")
+                        
+                        # Wenn die Ähnlichkeit den Schwellenwert überschreitet
+                        if similarity >= threshold:
+                            is_duplicate = True
+                            duplicate_path = compare_path
                             
-                            # Ähnlichkeit berechnen
-                            similarity = self.duplicate_detector.calculate_similarity(text, compare_text)
+                            # Spezielle Nachricht für Duplikaterkennung mit speziellem Präfix
+                            message = f"DUPLIKAT_ERKANNT|{filename}|{os.path.basename(file_path)}|{similarity:.2f}"
+                            print(message)  # Diese Zeile ist wichtig für die Erkennung im Stdout
+                            self.logger.info(message)
                             
-                            # Log für Debugging
-                            if self.verbose > 1:
-                                self.logger.debug(f"Ähnlichkeit mit {filename}: {similarity:.4f}")
-                            
-                            # Wenn die Ähnlichkeit den Schwellenwert überschreitet
-                            if similarity >= threshold:
-                                is_duplicate = True
-                                duplicate_path = compare_path
-                                
-                                # Spezielle Nachricht für Duplikaterkennung mit speziellem Präfix
-                                message = f"DUPLIKAT_ERKANNT|{filename}|{os.path.basename(file_path)}|{similarity:.2f}"
-                                print(message)  # Diese Zeile ist wichtig für die Erkennung im Stdout
-                                self.logger.info(message)
-                                
-                                # Wenn wir ein Duplikat gefunden haben, können wir die Schleife abbrechen
-                                return is_duplicate, duplicate_path
+                            break
             
             return is_duplicate, duplicate_path
             
@@ -221,8 +212,13 @@ class DocumentProcessor:
             is_duplicate (bool): Ob die Datei ein Duplikat ist
             force (bool): Wenn True, werden vorhandene Dateien überschrieben
             duplicate_path (str): Pfad zum Original-Duplikat, falls vorhanden
+            
+        Returns:
+            str: Pfad zur verschobenen Datei oder None bei Fehler
         """
         try:
+            target_path = None
+            
             if is_duplicate:
                 # Datei in den Papierkorb verschieben
                 target_dir = self.config.get('paths', {}).get('trash_dir', '')
@@ -254,8 +250,45 @@ class DocumentProcessor:
                 self.file_operations.move_to_output(file_path, target_path, force)
                 self.logger.info(f"Datei erfolgreich verarbeitet: {new_filename}")
             
-            return True
+            return target_path
             
         except Exception as e:
             self.logger.error(f"Fehler beim Verschieben der Datei: {str(e)}")
+            return None
+    
+    def _add_to_excel(self, doc_info, file_path):
+        """
+        Fügt ein verarbeitetes Dokument zur Excel-Tabelle hinzu.
+        
+        Args:
+            doc_info (dict): Extrahierte Dokumenteninformationen
+            file_path (str): Pfad zur verarbeiteten PDF-Datei (für den Hyperlink)
+            
+        Returns:
+            bool: True bei Erfolg, False bei Fehler
+        """
+        try:
+            # ExcelWriter initialisieren
+            excel_writer = ExcelWriter(self.config)
+            
+            # Dokument zur Excel-Tabelle hinzufügen
+            success = excel_writer.add_document(doc_info, file_path)
+            
+            if success:
+                self.logger.info(f"Dokument zur Excel-Tabelle hinzugefügt: {os.path.basename(file_path)}")
+            else:
+                self.logger.warning(f"Fehler beim Hinzufügen des Dokuments zur Excel-Tabelle: {os.path.basename(file_path)}")
+                
+            # Wenn das Dokument als Business oder Bar klassifiziert ist, speichere es auch im Business-Ordner
+            art = doc_info.get('art', '').lower()
+            if art in ['business', 'bar'] and 'datum' in doc_info:
+                archive_business_document(self.config, file_path, doc_info, self.logger)
+            
+            return success
+        
+        except ImportError:
+            self.logger.warning("ExcelWriter nicht verfügbar. Excel-Integration ist deaktiviert.")
+            return False
+        except Exception as e:
+            self.logger.error(f"Fehler beim Hinzufügen des Dokuments zur Excel-Tabelle: {str(e)}")
             return False

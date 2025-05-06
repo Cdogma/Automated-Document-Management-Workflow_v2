@@ -1,157 +1,83 @@
 """
-Funktionen zur Erstellung von Duplikatberichten für MaehrDocs
-Enthält Funktionalität zum Erstellen von Berichten über erkannte Duplikate
-in verschiedenen Formaten (Text, JSON, HTML).
+Duplikat-Berichterstattung für MaehrDocs
+Hauptmodul zur Erstellung detaillierter Berichte über erkannte Dokumentenduplikate.
+
+Dieses Modul importiert und koordiniert die spezialisierten Berichtsgeneratoren
+und stellt eine einheitliche Schnittstelle zur Berichterstellung bereit.
 """
 
 import os
 import logging
-from datetime import datetime
+import datetime
+from pathlib import Path
 
-def generate_duplicate_report(config, original_file, duplicate_file, new_filename, logger=None):
+# Importiere die Berichtsgeneratoren
+from maehrdocs.report_generators import (
+    generate_text_report,
+    generate_html_report,
+    generate_json_report
+)
+from maehrdocs.visual_comparison import generate_visual_comparison
+
+def generate_duplicate_report(config, duplicate_file, original_file, new_filename, logger=None):
     """
-    Generiert einen Bericht über erkannte Duplikate.
+    Generiert einen Bericht über ein erkanntes Duplikat.
     
-    Erstellt je nach Konfiguration einen Text-, JSON- oder HTML-Bericht
-    mit Details zu den erkannten Duplikaten.
+    Je nach Konfiguration wird ein Bericht im HTML-, Text- oder JSON-Format erstellt,
+    der detaillierte Informationen über beide Dateien enthält, und optional
+    einen visuellen Vergleich der Dokumente.
     
     Args:
-        config (dict): Konfigurationsdaten
-        original_file (str): Pfad zur Originaldatei
+        config (dict): Die Anwendungskonfiguration
         duplicate_file (str): Pfad zur Duplikatdatei
-        new_filename (str): Neuer Dateiname für die Duplikatdatei
-        logger (Logger): Logger-Instanz für Protokollierung (optional)
-        
+        original_file (str): Pfad zur Originaldatei
+        new_filename (str): Der generierte neue Dateiname (ohne Pfad)
+        logger: Optional, Logger-Instanz für die Protokollierung
+    
     Returns:
-        bool: True bei Erfolg, False bei Fehler
+        str: Pfad zum generierten Bericht oder None bei Fehler
     """
+    # Logger initialisieren, falls nicht übergeben
     if logger is None:
         logger = logging.getLogger(__name__)
-        
+    
     try:
-        # Konfiguration für Duplikatberichte laden
+        # Einstellungen für Duplikatberichte aus der Konfiguration laden
         report_format = config.get('duplicate_detection', {}).get('report_format', 'text')
+        report_dir = config.get('paths', {}).get('log_dir', '')
         
-        # Berichte legen wir im Log-Verzeichnis ab, falls konfiguriert
-        log_dir = config.get('paths', {}).get('log_dir', '')
-        if not log_dir:
-            log_dir = os.path.dirname(os.path.abspath(config.get('paths', {}).get('trash_dir', '')))
+        # Wenn kein Log-Verzeichnis konfiguriert ist, nehmen wir den Trash-Ordner
+        if not report_dir:
+            report_dir = config.get('paths', {}).get('trash_dir', '')
         
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
+        # Sicherstellen, dass das Verzeichnis existiert
+        if not os.path.exists(report_dir):
+            os.makedirs(report_dir)
         
-        # Berichtsname basierend auf Datum und Duplikatdatei
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        report_name = f"duplicate_report_{timestamp}_{os.path.basename(duplicate_file)}"
+        # Eindeutigen Dateinamen für den Bericht generieren
+        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        report_basename = f"duplicate_report_{timestamp}_{os.path.splitext(new_filename)[0]}"
         
         # Je nach gewünschtem Format den entsprechenden Bericht erstellen
-        if report_format == 'html':
-            return _create_html_report(log_dir, report_name, original_file, duplicate_file, new_filename, logger)
-        elif report_format == 'json':
-            return _create_json_report(log_dir, report_name, original_file, duplicate_file, new_filename, logger)
-        else:  # Standardmäßig Text
-            return _create_text_report(log_dir, report_name, original_file, duplicate_file, new_filename, logger)
-            
+        if report_format.lower() == 'html':
+            report_file = os.path.join(report_dir, f"{report_basename}.html")
+            generate_html_report(report_file, duplicate_file, original_file, config, logger)
+        elif report_format.lower() == 'json':
+            report_file = os.path.join(report_dir, f"{report_basename}.json")
+            generate_json_report(report_file, duplicate_file, original_file, config, logger)
+        else:  # Standardmäßig Textbericht erstellen
+            report_file = os.path.join(report_dir, f"{report_basename}.txt")
+            generate_text_report(report_file, duplicate_file, original_file, config, logger)
+        
+        # Visuellen Vergleich erstellen, falls gewünscht
+        if config.get('duplicate_detection', {}).get('visual_comparison', False):
+            visual_file = os.path.join(report_dir, f"{report_basename}_visual.html")
+            generate_visual_comparison(visual_file, duplicate_file, original_file, config, logger)
+        
+        logger.info(f"Duplikatbericht erstellt: {report_file}")
+        return report_file
+        
     except Exception as e:
         if logger:
             logger.error(f"Fehler bei der Erstellung des Duplikatberichts: {str(e)}")
-        return False
-
-def _create_html_report(log_dir, report_name, original_file, duplicate_file, new_filename, logger):
-    """
-    Erstellt einen HTML-Bericht über ein erkanntes Duplikat.
-    
-    Args:
-        log_dir (str): Verzeichnis für den Bericht
-        report_name (str): Basisname des Berichts
-        original_file (str): Pfad zur Originaldatei
-        duplicate_file (str): Pfad zur Duplikatdatei
-        new_filename (str): Neuer Dateiname für die Duplikatdatei
-        logger (Logger): Logger-Instanz für Protokollierung
-        
-    Returns:
-        bool: True bei Erfolg, False bei Fehler
-    """
-    report_path = os.path.join(log_dir, f"{report_name}.html")
-    try:
-        # HTML-Bericht erstellen (vereinfachte Version)
-        with open(report_path, 'w', encoding='utf-8') as f:
-            f.write(f"<html><head><title>Duplikatbericht</title></head><body>")
-            f.write(f"<h1>Duplikat erkannt</h1>")
-            f.write(f"<p><strong>Original:</strong> {original_file}</p>")
-            f.write(f"<p><strong>Duplikat:</strong> {duplicate_file}</p>")
-            f.write(f"<p><strong>Neuer Name:</strong> {new_filename}</p>")
-            f.write(f"<p><strong>Erkennungsdatum:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>")
-            f.write("</body></html>")
-        
-        logger.info(f"HTML-Duplikatbericht erstellt: {report_path}")
-        return True
-    except Exception as e:
-        logger.error(f"Fehler beim Erstellen des HTML-Duplikatberichts: {str(e)}")
-        return False
-
-def _create_json_report(log_dir, report_name, original_file, duplicate_file, new_filename, logger):
-    """
-    Erstellt einen JSON-Bericht über ein erkanntes Duplikat.
-    
-    Args:
-        log_dir (str): Verzeichnis für den Bericht
-        report_name (str): Basisname des Berichts
-        original_file (str): Pfad zur Originaldatei
-        duplicate_file (str): Pfad zur Duplikatdatei
-        new_filename (str): Neuer Dateiname für die Duplikatdatei
-        logger (Logger): Logger-Instanz für Protokollierung
-        
-    Returns:
-        bool: True bei Erfolg, False bei Fehler
-    """
-    report_path = os.path.join(log_dir, f"{report_name}.json")
-    try:
-        # JSON-Bericht erstellen
-        import json
-        report_data = {
-            "original": original_file,
-            "duplicate": duplicate_file,
-            "new_filename": new_filename,
-            "detection_date": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        with open(report_path, 'w', encoding='utf-8') as f:
-            json.dump(report_data, f, indent=4)
-        
-        logger.info(f"JSON-Duplikatbericht erstellt: {report_path}")
-        return True
-    except Exception as e:
-        logger.error(f"Fehler beim Erstellen des JSON-Duplikatberichts: {str(e)}")
-        return False
-
-def _create_text_report(log_dir, report_name, original_file, duplicate_file, new_filename, logger):
-    """
-    Erstellt einen Textbericht über ein erkanntes Duplikat.
-    
-    Args:
-        log_dir (str): Verzeichnis für den Bericht
-        report_name (str): Basisname des Berichts
-        original_file (str): Pfad zur Originaldatei
-        duplicate_file (str): Pfad zur Duplikatdatei
-        new_filename (str): Neuer Dateiname für die Duplikatdatei
-        logger (Logger): Logger-Instanz für Protokollierung
-        
-    Returns:
-        bool: True bei Erfolg, False bei Fehler
-    """
-    report_path = os.path.join(log_dir, f"{report_name}.txt")
-    try:
-        # Text-Bericht erstellen
-        with open(report_path, 'w', encoding='utf-8') as f:
-            f.write(f"Duplikatbericht\n")
-            f.write(f"===============\n\n")
-            f.write(f"Original: {original_file}\n")
-            f.write(f"Duplikat: {duplicate_file}\n")
-            f.write(f"Neuer Name: {new_filename}\n")
-            f.write(f"Erkennungsdatum: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        
-        logger.info(f"Text-Duplikatbericht erstellt: {report_path}")
-        return True
-    except Exception as e:
-        logger.error(f"Fehler beim Erstellen des Text-Duplikatberichts: {str(e)}")
-        return False
+        return None
