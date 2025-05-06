@@ -1,4 +1,4 @@
-# ==============================================================================
+# ============================================================================== 
 # MaehrDocs - Zentrale Konfigurationsdatei
 # ------------------------------------------------------------------------------
 # Diese Datei definiert alle relevanten Einstellungen für das automatisierte 
@@ -18,7 +18,7 @@
 # - Alle Pfade können individuell angepasst werden
 # - Änderungen an dieser Datei wirken sich direkt auf das Verhalten der Anwendung aus
 # - Kommentare und Formatierung beibehalten, um Übersicht und Lesbarkeit zu gewährleisten
-# ==============================================================================
+# ============================================================================== 
 
 
 # Pfade zu den Verzeichnissen
@@ -35,14 +35,7 @@ openai:
   temperature: 0.2  # Niedrige Temperatur für höhere Präzision
   max_retries: 5  # Erhöhte Anzahl der Wiederholungsversuche bei API-Fehlern
   api_key_env: "OPENAI_API_KEY"  # Name der Umgebungsvariable für den API-Schlüssel
-  system_prompt: "Du bist ein Experte für automatisierte Dokumentenverarbeitung mit Schwerpunkt auf deutschsprachigen Geschäftsdokumenten. Deine Aufgabe ist es, folgende Informationen präzise zu extrahieren und im JSON-Format zurückzugeben:
-1. absender: Identifiziere den genauen Firmennamen/Behörde/Person inkl. Rechtsform.
-2. datum: Erkenne das relevanteste Datum (Rechnungsdatum, Vertragsdatum, Briefdatum) im Format YYYY-MM-DD.
-3. dokumenttyp: Kategorisiere das Dokument eindeutig in eine der vorgegebenen Typen.
-4. betreff: Extrahiere den Kern-Betreff oder Hauptzweck des Dokuments in maximal 10 Wörtern.
-5. kennzahlen: Erfasse wichtige numerische Werte wie Rechnungsnummer, Kundennummer, Betrag (mit Währung), Steuerbeträge.
-
-Beachte typische Strukturelemente wie Briefkopf, Betreffzeile, Anrede, formelle Schlussformeln. Bei Unklarheiten wähle die präziseste mögliche Kategorisierung und gib Sicherheitsstufen in Prozent an."
+  system_prompt: "Du bist ein Experte für automatisierte Dokumentenverarbeitung mit Schwerpunkt auf deutschsprachigen Geschäftsdokumenten. Deine Aufgabe ist es, folgende Informationen präzise zu extrahieren und im JSON-Format zurückzugeben:\n1. absender: Identifiziere den genauen Firmennamen/Behörde/Person inkl. Rechtsform.\n2. datum: Erkenne das relevanteste Datum (Rechnungsdatum, Vertragsdatum, Briefdatum) im Format YYYY-MM-DD.\n3. dokumenttyp: Kategorisiere das Dokument eindeutig in eine der vorgegebenen Typen.\n4. betreff: Extrahiere den Kern-Betreff oder Hauptzweck des Dokuments in maximal 10 Wörtern.\n5. kennzahlen: Erfasse wichtige numerische Werte wie Rechnungsnummer, Kundennummer, Betrag (mit Währung), Steuerbeträge.\n\nBeachte typische Strukturelemente wie Briefkopf, Betreffzeile, Anrede, formelle Schlussformeln. Bei Unklarheiten wähle die präziseste mögliche Kategorisierung und gib Sicherheitsstufen in Prozent an."
 
 # Dokumentverarbeitungseinstellungen
 document_processing:
@@ -51,39 +44,85 @@ document_processing:
   max_pages_to_analyze: 25  # Maximale Anzahl zu analysierender Seiten bei großen Dokumenten
   extract_images: true  # Bilder aus PDFs extrahieren für bessere Analyse
   ocr_enabled: true  # OCR für Dokumente ohne extrahierbaren Text aktivieren
-  
+
+# Regeln zur automatischen Generierung sauberer Dateinamen
+filename_rules:
+  capitalize_doc_type: true             # Dokumenttyp in Großbuchstaben
+  remove_type_from_subject: true        # „Rechnung“ o. ä. aus Betreff entfernen
+  abbreviate_subject: true              # Längere Begriffe wie „Arbeitsmedizinische Betreuung 4. Quartal 2023“ → „AMB-4Q23“
+  shorten_sender_names: true            # Lange Absender vereinfachen (z. B. mit Mapping)
+  replace_spaces_with: "_"              # Trennzeichen im Dateinamen
+  max_filename_length: 100              # Maximale Zeichenlänge für Dateinamen
+  normalize_umlauts: true               # Umlaute umwandeln (z. B. „ü“ → „ue“)
+  clean_special_chars: true             # Sonderzeichen entfernen (z. B. \", *, ?, etc.)
+
   # Erweiterte Liste gültiger Dokumenttypen
   valid_doc_types:
-    - rechnung
-    - vertrag
-    - brief
-    - meldung
-    - bescheid
-    - dokument
-    - antrag
-    - angebot
-    - mahnung
-    - gutschrift
-    - gehaltsabrechnung
-    - versicherungspolice
-    - steuerbescheid
-    - lieferschein
-    - bestellung
-    - kündigungsbestätigung
-    - zertifikat
-    - protokoll
-    - bericht
-    - newsletter
-    - kontoauszug
-    - steuernachweis
-    - garantiebeleg
-    - bewerbung
-    - arbeitsvertrag
-    - mietvertrag
-    - abrechnung
-    - vollmacht
-    - einladung
-    - zeugnisdokument
+    - Abrechnung
+    - Analyse
+    - Angebot
+    - Anleitung
+    - Antrag
+    - Arbeitsvertrag
+    - Beleg
+    - Bericht
+    - Bescheid
+    - Bestellung
+    - Bestätigung
+    - Bewerbung
+    - Brief
+    - Broschüre
+    - Diagramm
+    - Dokument
+    - Einwilligungserklärung
+    - Einladung
+    - Entgeltabrechnung
+    - Exposé
+    - Fahrplan
+    - Flyer
+    - Formular
+    - Garantiebeleg
+    - Gutschrift
+    - Handbuch
+    - Konzept
+    - Kontoauszug
+    - Kostenvoranschlag
+    - Kündigung
+    - Kündigungsbestätigung
+    - Lebenslauf
+    - Lieferschein
+    - Lizenz
+    - Mahnung
+    - Manuskript
+    - Meldung
+    - Mietvertrag
+    - Mitgliedsausweis
+    - Newsletter
+    - Organigramm
+    - Patientenverfügung
+    - Plan
+    - Präsentation
+    - Pressemitteilung
+    - Protokoll
+    - Prüfbericht
+    - Rechnung
+    - Richtlinie
+    - Schulungsunterlagen
+    - Spezifikation
+    - Steuerbescheid
+    - Steuernachweis
+    - Studie
+    - Teilnahmebescheinigung
+    - Ticket
+    - Urkunde
+    - Vertrag
+    - Vergleich
+    - Versicherungspolice
+    - Verschwiegenheitserklärung
+    - Vollmacht
+    - Zertifikat
+    - Zeugnisdokument
+    - Übersicht
 
   # Format für Dateinamen nach der Verarbeitung
   filename_format: "{datum}_{typ}_{absender}_{betreff}.pdf"
@@ -137,7 +176,7 @@ gui:
   enable_sounds: false  # Soundeffekte aktivieren
   check_interval_seconds: 5  # Intervall für die Überprüfung auf neue Dokumente
   notify_on_new_documents: true  # Benachrichtigung anzeigen, wenn neue Dokumente gefunden werden
-  
+
   # Anpassbare Farben
   colors:
     background_dark: "#0D1117"    # Tiefdunkles Blau-Schwarz

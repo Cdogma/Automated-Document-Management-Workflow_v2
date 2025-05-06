@@ -1,0 +1,54 @@
+
+maehrdocs_ablauf:
+  - step: "Datei erkannt"
+    details: "PDF wird im Verzeichnis 01_InboxDocs entdeckt"
+  - step: "Vorverarbeitung"
+    details: "OCR bei Bedarf, Prüfung auf Größe, Format, etc."
+  - step: "GPT-Analyse"
+    extract:
+      - datum
+      - dokumenttyp
+      - absender
+      - betreff
+      - brutto
+      - netto
+      - mwst_betrag
+      - steuersatz
+      - art
+      - confidence
+  - step: "Duplikaterkennung"
+    details: "Vergleich in FinalDocs und Archiv"
+  - step: "Dateinamen generieren"
+    method: "YAML-gesteuerte Formatierung und Bereinigung"
+  - step: "Ablage"
+    paths:
+      - "02_FinalDocs"
+      - "05_Archive_Rechnungen/JJJJ_Ordner"
+  - step: "Excel-Eintrag"
+    fields:
+      - datum
+      - typ
+      - absender
+      - betreff
+      - netto
+      - mwst
+      - brutto
+      - waehrung
+      - rechnungsnummer
+      - art
+      - bezahlt
+      - steuersatz
+      - link
+      - lexware_status
+  - step: "Zahlungsabgleich (optional)"
+    method: "Matching mit Bank-CSV"
+  - step: "Lexware-Upload (optional)"
+    status_update: "lexware_status"
+  - step: "Archivierung (optional)"
+    zip_export: "monatlich"
+    excel_pdf: true
+  - step: "GUI-Anzeige (optional)"
+    features:
+      - filter
+      - öffnen
+      - suchfunktion
