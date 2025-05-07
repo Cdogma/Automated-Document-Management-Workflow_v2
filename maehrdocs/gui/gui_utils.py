@@ -264,3 +264,50 @@ def is_valid_path(path):
     
     except Exception:
         return False
+    
+    # Zu aktualisieren in gui_utils.py
+
+def update_dashboard(app):
+    """
+    Aktualisiert die Anzeigen im Dashboard
+    
+    Args:
+        app: Instanz der GuiApp
+    """
+    # Verwenden des ErrorHandlers für diese Operation
+    with app.error_handler.safe_operation(context="Dashboard-Aktualisierung", level="warning"):
+        # Inbox
+        inbox_path = app.config["paths"]["input_dir"]
+        inbox_count = len([f for f in os.listdir(inbox_path) if f.lower().endswith('.pdf')])
+        app.dashboard_elements["inbox_card"].count_value.config(text=str(inbox_count))
+        app.dashboard_elements["inbox_card"].path_value.config(text=inbox_path)
+        
+        # Processed
+        processed_path = app.config["paths"]["output_dir"]
+        processed_count = len([f for f in os.listdir(processed_path) if f.lower().endswith('.pdf')])
+        app.dashboard_elements["processed_card"].count_value.config(text=str(processed_count))
+        app.dashboard_elements["processed_card"].path_value.config(text=processed_path)
+        
+        # Trash
+        trash_path = app.config["paths"]["trash_dir"]
+        trash_count = len([f for f in os.listdir(trash_path) if f.lower().endswith('.pdf')])
+        app.dashboard_elements["trash_card"].count_value.config(text=str(trash_count))
+        app.dashboard_elements["trash_card"].path_value.config(text=trash_path)
+        
+        # NEU: Wenn das Statistik-Panel vorhanden ist, Charts aktualisieren
+        if "statistics_panel" in app.dashboard_elements:
+            # Finde die StatisticsPanel-Instanz über das Frame
+            for widget in app.dashboard_elements["statistics_panel"].master.winfo_children():
+                if hasattr(widget, 'update_charts'):
+                    widget.update_charts()
+                    break
+        
+        # Letzte Verarbeitungszeit aktualisieren
+        app.messaging.update_status(f"Zuletzt aktualisiert: {datetime.now().strftime('%H:%M:%S')}")
+        
+        # Aktivitätsliste aktualisieren, wenn vorhanden
+        if "activity_list" in app.dashboard_elements:
+            app.dashboard_elements["activity_list"].config(state=tk.NORMAL)
+            app.dashboard_elements["activity_list"].delete(1.0, tk.END)
+            app.dashboard_elements["activity_list"].insert(tk.END, "Dashboard aktualisiert.")
+            app.dashboard_elements["activity_list"].config(state=tk.DISABLED)

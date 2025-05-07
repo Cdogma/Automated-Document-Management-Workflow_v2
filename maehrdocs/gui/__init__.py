@@ -81,3 +81,22 @@ __all__ = [
     'run_command_in_thread',
     'handle_duplicate_from_log'
 ]
+
+# Zu ergänzen in gui/__init__.py
+from .gui_statistics import create_statistics_panel
+from .gui_statistics_data import collect_data
+from .gui_statistics_charts import create_chart_figure
+
+# Exportiere die neuen Funktionen
+__all__.extend([
+    'create_statistics_panel',
+    'collect_data',
+    'create_chart_figure'
+])
+
+# Statistik-Komponenten importieren
+from .gui_statistics import create_statistics_panel
+
+# Exportiere die neuen Funktionen (falls eine __all__ Liste vorhanden ist)
+if '__all__' in locals() or '__all__' in globals():
+    __all__.extend(['create_statistics_panel'])

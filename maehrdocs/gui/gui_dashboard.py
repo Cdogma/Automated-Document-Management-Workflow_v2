@@ -5,6 +5,7 @@ Erstellt das Dashboard mit Statuskarten und Aktivitätsanzeige
 
 import tkinter as tk
 from .gui_cards import create_status_card
+from .gui_statistics import create_statistics_panel
 
 def create_dashboard(app, parent, config, open_folder_callback):
     """
@@ -75,5 +76,13 @@ def create_dashboard(app, parent, config, open_folder_callback):
     )
     activity_list.pack(fill=tk.X)
     dashboard_elements["activity_list"] = activity_list
+    
+    # NEU: Statistik-Panel hinzufügen
+    statistics_frame = tk.Frame(dashboard_frame, bg=app.colors["background_medium"], pady=10)
+    statistics_frame.pack(fill=tk.BOTH, expand=True)
+    
+    # Statistik-Panel erstellen
+    stats_elements = create_statistics_panel(app, statistics_frame)
+    dashboard_elements["statistics_panel"] = stats_elements["stats_frame"]
     
     return dashboard_elements
