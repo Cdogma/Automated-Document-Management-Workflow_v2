@@ -1,22 +1,17 @@
 """
 Statistikkomponente für MaehrDocs GUI
 Enthält Funktionen zum Erstellen und Anzeigen von statistischen Auswertungen
-über verarbeitete Dokumente mit erweiterten Filtermöglichkeiten.
+über verarbeitete Dokumente mit erweiterten Filtermöglichkeiten und
+interaktiven Elementen.
 """
 
 import tkinter as tk
 from tkinter import ttk
 import logging
 
-# Eigene Module importieren
+# Eigene Module importieren - AKTUALISIERT
 from .gui_statistics_data import collect_data, clear_cache
-from .gui_statistics_charts import (
-    create_chart_figure,
-    update_type_chart,
-    update_sender_chart,
-    update_size_chart,
-    update_timeline_chart
-)
+from .gui_charts_manager import ChartManager  # Neuer Import
 
 class StatisticsPanel:
     """
@@ -46,6 +41,9 @@ class StatisticsPanel:
         self.app = app
         self.parent_frame = parent_frame
         self.logger = logging.getLogger(__name__)
+        
+        # ChartManager initialisieren
+        self.chart_manager = ChartManager(app)
         
         # Filter-Optionen
         self.time_periods = ["Alle", "Heute", "Diese Woche", "Dieser Monat", "Dieses Jahr"]
@@ -196,11 +194,11 @@ class StatisticsPanel:
         self.timeline_chart_frame = tk.Frame(self.charts_frame, bg=self.app.colors["background_medium"])
         self.timeline_chart_frame.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
         
-        # Matplotlib-Figuren erstellen
-        self.type_figure, self.type_canvas = create_chart_figure(self.app, self.type_chart_frame)
-        self.sender_figure, self.sender_canvas = create_chart_figure(self.app, self.sender_chart_frame)
-        self.size_figure, self.size_canvas = create_chart_figure(self.app, self.size_chart_frame)
-        self.timeline_figure, self.timeline_canvas = create_chart_figure(self.app, self.timeline_chart_frame)
+        # Charts mit dem ChartManager erstellen
+        _, self.type_canvas = self.chart_manager.create_chart(self.type_chart_frame, "type_chart", "type")
+        _, self.sender_canvas = self.chart_manager.create_chart(self.sender_chart_frame, "sender_chart", "sender")
+        _, self.size_canvas = self.chart_manager.create_chart(self.size_chart_frame, "size_chart", "size")
+        _, self.timeline_canvas = self.chart_manager.create_chart(self.timeline_chart_frame, "timeline_chart", "timeline")
     
     def _on_filter_change(self):
         """Wird aufgerufen, wenn sich ein Filter ändert."""
@@ -253,30 +251,8 @@ class StatisticsPanel:
             # Zusätzliche Filter anwenden
             filtered_data = self._apply_filters(data)
             
-            # Charts aktualisieren
-            # Typ-Chart
-            self.type_figure.clear()
-            type_ax = self.type_figure.add_subplot(111)
-            update_type_chart(type_ax, filtered_data, self.app, self.type_figure)
-            self.type_canvas.draw()
-            
-            # Absender-Chart
-            self.sender_figure.clear()
-            sender_ax = self.sender_figure.add_subplot(111)
-            update_sender_chart(sender_ax, filtered_data, self.app, self.sender_figure)
-            self.sender_canvas.draw()
-            
-            # Größen-Chart
-            self.size_figure.clear()
-            size_ax = self.size_figure.add_subplot(111)
-            update_size_chart(size_ax, filtered_data, self.app, self.size_figure)
-            self.size_canvas.draw()
-            
-            # Zeitverlauf-Chart
-            self.timeline_figure.clear()
-            timeline_ax = self.timeline_figure.add_subplot(111)
-            update_timeline_chart(timeline_ax, filtered_data, self.app, self.timeline_figure)
-            self.timeline_canvas.draw()
+            # Alle Charts über den ChartManager aktualisieren
+            self.chart_manager.update_all_charts(filtered_data)
             
             # Log generieren
             filter_info = f"Zeitraum: {period}"

@@ -85,7 +85,7 @@ __all__ = [
 # Zu ergänzen in gui/__init__.py
 from .gui_statistics import create_statistics_panel
 from .gui_statistics_data import collect_data
-from .gui_statistics_charts import create_chart_figure
+from .gui_statistics_charts_backup import create_chart_figure
 
 # Exportiere die neuen Funktionen
 __all__.extend([
@@ -100,3 +100,23 @@ from .gui_statistics import create_statistics_panel
 # Exportiere die neuen Funktionen (falls eine __all__ Liste vorhanden ist)
 if '__all__' in locals() or '__all__' in globals():
     __all__.extend(['create_statistics_panel'])
+
+    # Zu ergänzen in gui/__init__.py
+from .gui_charts_manager import ChartManager
+from .gui_charts_core import create_chart_figure, add_tooltip, create_detail_dialog
+from .gui_charts_basic import update_type_chart, update_size_chart
+from .gui_charts_advanced import update_sender_chart, update_timeline_chart
+from .gui_charts_interactive import register_chart_events
+
+# Exportiere die neuen Funktionen
+__all__.extend([
+    'ChartManager',
+    'create_chart_figure',
+    'add_tooltip',
+    'create_detail_dialog',
+    'update_type_chart',
+    'update_size_chart',
+    'update_sender_chart',
+    'update_timeline_chart',
+    'register_chart_events'
+])
