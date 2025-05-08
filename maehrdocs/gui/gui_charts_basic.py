@@ -2,9 +2,6 @@
 Basisdiagramme für die Statistikvisualisierung in MaehrDocs
 Enthält Funktionen für einfache Chart-Typen wie Balkendiagramme für 
 Dokumenttypen und Größenverteilungen.
-
-Diese Datei implementiert die grundlegenden Visualisierungen für die Statistik-
-Komponente mit Fehlerbehandlung und Dark-Theme-Unterstützung.
 """
 
 import logging
@@ -13,34 +10,25 @@ from . import gui_charts_core as core
 def update_type_chart(ax, data, app, figure):
     """
     Aktualisiert ein Achsenobjekt mit einem Chart zur Visualisierung der Dokumenttypen.
-    
-    Args:
-        ax: Die matplotlib-Achse für das Chart
-        data: Die gesammelten Dokumentendaten
-        app: Die Hauptanwendung (GuiApp-Instanz)
-        figure: Die matplotlib-Figur, die die Achse enthält
     """
     try:
         types = data.get("types", {})
         
-        # Fehlerbehandlung: Keine Daten
         if not types:
             core.handle_empty_data(ax, app, "Keine Dokumenttypen verfügbar")
             return
         
-        # Nach Anzahl sortieren (absteigend)
         sorted_types = dict(sorted(types.items(), key=lambda item: item[1], reverse=True))
         
-        # Farbpalette für die Balken - heller und kontrastreicher für Dark Mode
+        # Angepasste Farbpalette für bessere Sichtbarkeit im Dark Mode
         colors = [
-            app.colors["primary"],
-            app.colors["accent"],
-            app.colors["success"],
-            app.colors["warning"],
-            app.colors["error"]
+            '#3498db',  # Hellblau
+            '#2ecc71',  # Grün
+            '#e74c3c',  # Rot
+            '#f39c12',  # Orange
+            '#9b59b6',  # Violett
         ]
         
-        # Begrenzen auf die Top 10
         if len(sorted_types) > 10:
             top_types = dict(list(sorted_types.items())[:9])
             other_count = sum(dict(list(sorted_types.items())[9:]).values())
@@ -51,36 +39,32 @@ def update_type_chart(ax, data, app, figure):
         bars = ax.bar(
             sorted_types.keys(),
             sorted_types.values(),
-            color=colors[:len(sorted_types)]
+            color=colors[:len(sorted_types)],
+            edgecolor='none',
+            alpha=0.9
         )
         
-        # Grid für bessere Lesbarkeit
-        ax.yaxis.grid(True, linestyle='--', alpha=0.3)
+        # Grid mit dunklem Design
+        ax.yaxis.grid(True, linestyle='--', alpha=0.1, color=app.colors["text_secondary"])
+        ax.set_axisbelow(True)
         
         # Beschriftungen
-        ax.set_title("Dokumentenverteilung nach Typ")
-        ax.set_xlabel("Dokumenttyp")
-        ax.set_ylabel("Anzahl")
+        ax.set_title("Dokumentenverteilung nach Typ", fontsize=14, color=app.colors["text_primary"])
+        ax.set_xlabel("Dokumenttyp", color=app.colors["text_primary"])
+        ax.set_ylabel("Anzahl", color=app.colors["text_primary"])
         
-        # X-Achsen-Beschriftungen rotieren für bessere Lesbarkeit
+        # X-Achsen-Beschriftungen rotieren
         ax.set_xticklabels(sorted_types.keys(), rotation=45, ha='right')
         
-        # Zahlen über den Balken anzeigen - mit kontrastreichem Hintergrund
+        # Zahlen über den Balken anzeigen
         for bar in bars:
             height = bar.get_height()
-            # Hellerer und besser sichtbarer Text für Balken-Beschriftungen
-            ax.annotate(f'{height}',
-                       xy=(bar.get_x() + bar.get_width() / 2, height),
-                       xytext=(0, 3),  # 3 Punkte Offset
-                       textcoords="offset points",
+            if height > 0:
+                ax.text(bar.get_x() + bar.get_width()/2., height,
+                       f'{int(height)}',
                        ha='center', va='bottom',
-                       color='white',  # Immer weiß für besseren Kontrast
-                       bbox=dict(boxstyle="round,pad=0.3", fc=app.colors["primary"], alpha=0.7))
-        
-        # Tooltips zu den Balken hinzufügen
-        for bar, (type_name, count) in zip(bars, sorted_types.items()):
-            tooltip_text = f"{type_name}: {count} Dokumente"
-            core.add_tooltip(figure, ax, bar, tooltip_text)
+                       color=app.colors["text_primary"],
+                       fontsize=10)
         
         # Dark Theme anwenden
         core.apply_dark_theme(ax, app, figure)
@@ -99,17 +83,10 @@ def update_type_chart(ax, data, app, figure):
 def update_size_chart(ax, data, app, figure):
     """
     Aktualisiert ein Achsenobjekt mit einem Chart zur Visualisierung der Dokumentgrößen.
-    
-    Args:
-        ax: Die matplotlib-Achse für das Chart
-        data: Die gesammelten Dokumentendaten
-        app: Die Hauptanwendung (GuiApp-Instanz)
-        figure: Die matplotlib-Figur, die die Achse enthält
     """
     try:
         sizes = data.get("sizes", {})
         
-        # Fehlerbehandlung: Keine Daten
         if not sizes:
             core.handle_empty_data(ax, app, "Keine Größendaten verfügbar")
             return
@@ -123,12 +100,12 @@ def update_size_chart(ax, data, app, figure):
             else:
                 ordered_sizes[category] = 0
         
-        # Klarere, hellere Farbpalette für besseren Kontrast
+        # Angepasste Farbpalette für bessere Sichtbarkeit
         colors = [
-            '#4CAF50',  # Hellgrün
-            '#2196F3',  # Hellblau
-            '#FFC107',  # Amber
-            '#F44336'   # Rot
+            '#2ecc71',  # Grün
+            '#3498db',  # Blau
+            '#f39c12',  # Orange
+            '#e74c3c'   # Rot
         ]
         
         # Balkendiagramm erstellen
@@ -136,33 +113,28 @@ def update_size_chart(ax, data, app, figure):
             ordered_sizes.keys(),
             ordered_sizes.values(),
             color=colors[:len(ordered_sizes)],
-            edgecolor=app.colors["background_dark"],  # Kanten für bessere Sichtbarkeit
-            linewidth=1
+            edgecolor='none',
+            alpha=0.9
         )
         
-        # Grid für bessere Lesbarkeit
-        ax.yaxis.grid(True, linestyle='--', alpha=0.3)
+        # Grid mit dunklem Design
+        ax.yaxis.grid(True, linestyle='--', alpha=0.1, color=app.colors["text_secondary"])
+        ax.set_axisbelow(True)
         
         # Beschriftungen
-        ax.set_title("Dokumentenverteilung nach Größe")
-        ax.set_xlabel("Dokumentgröße")
-        ax.set_ylabel("Anzahl")
+        ax.set_title("Dokumentenverteilung nach Größe", fontsize=14, color=app.colors["text_primary"])
+        ax.set_xlabel("Dokumentgröße", color=app.colors["text_primary"])
+        ax.set_ylabel("Anzahl", color=app.colors["text_primary"])
         
-        # Zahlen über den Balken anzeigen - mit kontrastreichem Hintergrund
+        # Zahlen über den Balken anzeigen
         for bar in bars:
             height = bar.get_height()
-            ax.annotate(f'{height}',
-                       xy=(bar.get_x() + bar.get_width() / 2, height),
-                       xytext=(0, 3),  # 3 Punkte Offset
-                       textcoords="offset points",
+            if height > 0:
+                ax.text(bar.get_x() + bar.get_width()/2., height,
+                       f'{int(height)}',
                        ha='center', va='bottom',
-                       color='white',  # Weiß für besten Kontrast
-                       bbox=dict(boxstyle="round,pad=0.3", fc=app.colors["primary"], alpha=0.7))
-        
-        # Tooltips zu den Balken hinzufügen
-        for bar, (size_category, count) in zip(bars, ordered_sizes.items()):
-            tooltip_text = f"{size_category}: {count} Dokumente"
-            core.add_tooltip(figure, ax, bar, tooltip_text)
+                       color=app.colors["text_primary"],
+                       fontsize=10)
         
         # Dark Theme anwenden
         core.apply_dark_theme(ax, app, figure)

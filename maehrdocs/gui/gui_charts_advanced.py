@@ -2,10 +2,6 @@
 Fortgeschrittene Diagramme für die Statistikvisualisierung in MaehrDocs
 Enthält Funktionen für komplexere Chart-Typen wie Kreisdiagramme für Absender
 und Liniendiagramme für Zeitverläufe.
-
-Diese Datei implementiert die anspruchsvolleren Visualisierungen für die Statistik-
-Komponente mit zusätzlicher Interaktivität, Tooltips und verbesserten
-Darstellungsoptionen.
 """
 
 import logging
@@ -18,17 +14,10 @@ def update_sender_chart(ax, data, app, figure):
     """
     Aktualisiert ein Achsenobjekt mit einem Kreisdiagramm zur Visualisierung der 
     Dokumentabsender.
-    
-    Args:
-        ax: Die matplotlib-Achse für das Chart
-        data: Die gesammelten Dokumentendaten
-        app: Die Hauptanwendung (GuiApp-Instanz)
-        figure: Die matplotlib-Figur, die die Achse enthält
     """
     try:
         senders = data.get("senders", {})
         
-        # Fehlerbehandlung: Keine Daten
         if not senders:
             core.handle_empty_data(ax, app, "Keine Absenderdaten verfügbar")
             return
@@ -43,23 +32,23 @@ def update_sender_chart(ax, data, app, figure):
             top_senders["Andere"] = other_count
             sorted_senders = top_senders
         
-        # Hellere Farben für besseren Kontrast im Dark Mode
+        # Angepasste Farbpalette für bessere Sichtbarkeit im Dark Mode
         colors = [
-            '#5DA5DA', '#FAA43A', '#60BD68', '#F17CB0', '#B2912F',
-            '#B276B2', '#DECF3F', '#F15854', '#4D4D4D', '#1E90FF'
+            '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6',
+            '#34495e', '#16a085', '#e67e22', '#8e44ad', '#2980b9'
         ]
         
         # Kreisdiagramm erstellen
         wedges, texts, autotexts = ax.pie(
             sorted_senders.values(),
-            labels=None,  # Labels in der Legende statt direkt am Kreis
+            labels=None,  # Labels in der Legende
             autopct='%1.1f%%',
-            textprops={'color': 'white', 'fontweight': 'bold'},  # Kontrastreiche Prozentangaben
+            textprops={'color': 'white', 'fontweight': 'bold', 'fontsize': 10},
             colors=colors[:len(sorted_senders)],
-            wedgeprops={'width': 0.5, 'edgecolor': app.colors["background_medium"]}  # Donut mit Randfarbe
+            wedgeprops={'width': 0.5, 'edgecolor': app.colors["background_dark"], 'linewidth': 1}
         )
         
-        # Schatten hinzufügen für bessere Sichtbarkeit
+        # Schatten für bessere Sichtbarkeit
         for w in wedges:
             w.set_path_effects([
                 matplotlib.patheffects.withStroke(linewidth=2, foreground=app.colors["background_dark"])
@@ -71,25 +60,20 @@ def update_sender_chart(ax, data, app, figure):
                 matplotlib.patheffects.withStroke(linewidth=2, foreground=app.colors["background_dark"])
             ])
         
-        # Legende hinzufügen mit besserer Positionierung
+        # Legende mit Dark Theme
         legend = ax.legend(
             wedges,
             sorted_senders.keys(),
             loc="center left",
             bbox_to_anchor=(1, 0, 0.5, 1),
-            frameon=True,  # Rahmen für bessere Lesbarkeit
+            frameon=True,
             facecolor=app.colors["background_medium"],
-            edgecolor=app.colors["text_secondary"]
+            edgecolor=app.colors["text_secondary"],
+            labelcolor=app.colors["text_primary"]
         )
         
-        # Beschriftung
-        ax.set_title("Dokumentenverteilung nach Absender")
-        
-        # Tooltips zu den Kuchenstücken hinzufügen
-        for wedge, (sender, count) in zip(wedges, sorted_senders.items()):
-            percentage = 100 * count / sum(sorted_senders.values())
-            tooltip_text = f"{sender}: {count} Dokumente ({percentage:.1f}%)"
-            core.add_tooltip(figure, ax, wedge, tooltip_text)
+        # Titel
+        ax.set_title("Dokumentenverteilung nach Absender", fontsize=14, color=app.colors["text_primary"])
         
         # Dark Theme anwenden
         core.apply_dark_theme(ax, app, figure)
@@ -100,7 +84,7 @@ def update_sender_chart(ax, data, app, figure):
         # Daten im Chart-Objekt speichern für Interaktivität
         ax.sender_data = sorted_senders
         ax.documents = data.get("documents", [])
-        ax.wedges = wedges  # Für die Interaktivität
+        ax.wedges = wedges
         
     except Exception as e:
         logger = logging.getLogger(__name__)
@@ -111,17 +95,10 @@ def update_timeline_chart(ax, data, app, figure):
     """
     Aktualisiert ein Achsenobjekt mit einem Liniendiagramm zur Visualisierung des 
     Dokumentenzeitlaufs.
-    
-    Args:
-        ax: Die matplotlib-Achse für das Chart
-        data: Die gesammelten Dokumentendaten
-        app: Die Hauptanwendung (GuiApp-Instanz)
-        figure: Die matplotlib-Figur, die die Achse enthält
     """
     try:
         timeline = data.get("timeline", {})
         
-        # Fehlerbehandlung: Keine Daten
         if not timeline:
             core.handle_empty_data(ax, app, "Keine Zeitdaten verfügbar")
             return
@@ -129,90 +106,67 @@ def update_timeline_chart(ax, data, app, figure):
         # Daten sortieren und für matplotlib aufbereiten
         dates = []
         counts = []
-        date_dict = {}  # Speichert original Datum zu formatiertem Datum
+        date_dict = {}
         
-        # Fehlerbehandlung: Ungültige Datumsformate
         for date_str, count in sorted(timeline.items()):
             try:
                 date_obj = datetime.strptime(date_str, "%Y-%m-%d")
                 dates.append(date_obj)
                 counts.append(count)
-                date_dict[date_obj] = date_str  # Für spätere Referenz
+                date_dict[date_obj] = date_str
             except ValueError:
-                # Ungültiges Datum überspringen
                 logger = logging.getLogger(__name__)
                 logger.warning(f"Ungültiges Datumsformat übersprungen: {date_str}")
                 continue
         
-        # Prüfen, ob nach der Filterung noch Daten übrig sind
         if not dates:
             core.handle_empty_data(ax, app, "Keine gültigen Zeitdaten verfügbar")
             return
         
-        # Linienchart erstellen mit größerer Linienbreite und hellerer Farbe
+        # Linienchart erstellen
         line, = ax.plot(
             dates, counts,
             marker='o',
             linestyle='-',
-            linewidth=2.5,  # Dickere Linie
-            color='#3498db',  # Helleres Blau
+            linewidth=2.5,
+            color='#3498db',
             markersize=8,
-            markerfacecolor='#f39c12',  # Kontrastreiche Markerfarbe
+            markerfacecolor='#3498db',
             markeredgecolor='white',
             markeredgewidth=1.5
         )
         
-        # Füllung unter der Linie für bessere Sichtbarkeit
+        # Füllung unter der Linie
         ax.fill_between(dates, counts, alpha=0.2, color='#3498db')
         
-        # Grid für bessere Lesbarkeit
-        ax.grid(True, linestyle='--', alpha=0.3)
+        # Grid mit dunklem Design
+        ax.grid(True, linestyle='--', alpha=0.1, color=app.colors["text_secondary"])
+        ax.set_axisbelow(True)
         
         # Datumsformatierung
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
         
-        # Wenn mehr als 7 Datumspunkte, nur einige anzeigen
+        # Wenn mehr als 7 Datumspunkte, automatische Locator
         if len(dates) > 7:
-            # Wochenweises Raster
-            ax.xaxis.set_major_locator(mdates.WeekdayLocator(interval=1))
-            # Alternativ: Automatische Locator für schönere Achsenbeschriftung
-            # Geeignet für längere Zeiträume
-            if len(dates) > 30:
-                ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+            ax.xaxis.set_major_locator(mdates.AutoDateLocator())
         
         # Datenpunkte beschriften
         for i, (date, count) in enumerate(zip(dates, counts)):
-            if count > 0:  # Nur beschriften, wenn Wert größer 0
-                ax.annotate(f'{count}',
-                           xy=(date, count),
-                           xytext=(0, 10),
-                           textcoords="offset points",
-                           ha='center',
-                           color='white',
-                           bbox=dict(boxstyle="round,pad=0.3", fc=app.colors["primary"], alpha=0.7))
-        
-        # Tooltips für die Datenpunkte
-        scatter = ax.scatter(dates, counts, s=0)  # Unsichtbare Scatter-Punkte für bessere Tooltips
-        for date, count in zip(dates, counts):
-            # Formatieren für den Tooltip
-            date_str = date.strftime("%d.%m.%Y")
-            tooltip_text = f"Datum: {date_str}\nDokumente: {count}"
-            
-            # Tooltip-Bereich erstellen
-            # Wir erstellen einen unsichtbaren Kreis um jeden Datenpunkt
-            point = matplotlib.patches.Circle((mdates.date2num(date), count), 
-                                             radius=0.2, 
-                                             transform=ax.get_xaxis_transform(),
-                                             alpha=0.0)  # unsichtbar
-            ax.add_patch(point)
-            
-            # Tooltip zum Punkt hinzufügen
-            core.add_tooltip(figure, ax, point, tooltip_text)
+            if count > 0:
+                ax.text(date, count,
+                       f'{int(count)}',
+                       ha='center', va='bottom',
+                       color=app.colors["text_primary"],
+                       fontsize=10,
+                       bbox=dict(boxstyle="round,pad=0.3", 
+                                facecolor=app.colors["background_medium"], 
+                                alpha=0.8,
+                                edgecolor='none'))
         
         # Beschriftungen
-        ax.set_title("Dokumentenaufkommen im Zeitverlauf")
-        ax.set_xlabel("Datum")
-        ax.set_ylabel("Anzahl")
+        ax.set_title("Dokumentenaufkommen im Zeitverlauf", fontsize=14, color=app.colors["text_primary"])
+        ax.set_xlabel("Datum", color=app.colors["text_primary"])
+        ax.set_ylabel("Anzahl", color=app.colors["text_primary"])
         
         # Dark Theme anwenden
         core.apply_dark_theme(ax, app, figure)
@@ -227,7 +181,7 @@ def update_timeline_chart(ax, data, app, figure):
         ax.timeline_data = timeline
         ax.dates = dates
         ax.counts = counts
-        ax.date_dict = date_dict  # Für Zuordnung formatierter Daten
+        ax.date_dict = date_dict
         ax.documents = data.get("documents", [])
         
     except Exception as e:
